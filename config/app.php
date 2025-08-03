@@ -13,12 +13,13 @@ return [
     |
     */
 
-    'server' => [
-        'username' => env('SERVER_USERNAME', 'root'),
-        'password' => env('SERVER_PASSWORD'),
-        'host' => env('SERVER_HOST', 'example.com'),
-        'port' => env('SERVER_PORT', 2222),
-        'ip' => env('SERVER_IP', '0.0.0.0'),
+    'hosting' => [
+        'username' => env('HOSTING_USERNAME', 'root'),
+        'password' => env('HOSTING_PASSWORD'),
+        'host' => env('HOSTING_HOST', 'example.com'),
+        'port' => env('HOSTING_PORT', 2222),
+        'ip' => env('HOSTING_IP', '0.0.0.0'),
+        'url' => env('HOSTING_URL', 'https://example.com:2222'),
     ],
 
     /*
