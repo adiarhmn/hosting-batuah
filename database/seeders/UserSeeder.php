@@ -27,8 +27,6 @@ class UserSeeder extends Seeder
                 'name' => 'Batuah Admin',
                 'role_id' => 1, // Admin role
                 'email' => 'adminbatuah@gmail.com',
-                'phone' => '081234567890',
-                'address' => 'Jl. Admin Batuah No. 1',
                 'email_verified_at' => now(),
                 'password' => bcrypt('hostingbts88'),
             ]

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\UserDetails;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -61,10 +62,23 @@ class AuthController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => bcrypt($request->password),
-                'role_id' => 2, // Assuming '2' is the role ID for 'user'
+                'role_id' => 2, // 2 Is the role ID for 'user' --- IGNORE
+            ]);
+
+            // Membuat nama tanpa spasi untuk username
+
+            $username = str_replace(' ', '', strtolower($request->name)) . rand(1000, 9999);
+            $code = strtoupper(substr($username, 0, 3)) . rand(1000, 9999);
+
+            UserDetails::create([
+                'user_id' => $user->id,
                 'phone' => $request->phone,
                 'address' => $request->address,
+                'username' => $username,
+                'code' => $code,
             ]);
+
+            Auth::login($user);
 
             return redirect('email/verify')->with('success', 'Registration successful! Please check your email for verification.');
         } catch (\Exception $e) {

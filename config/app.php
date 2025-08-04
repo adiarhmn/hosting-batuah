@@ -20,6 +20,7 @@ return [
         'port' => env('HOSTING_PORT', 2222),
         'ip' => env('HOSTING_IP', '0.0.0.0'),
         'url' => env('HOSTING_URL', 'https://example.com:2222'),
+        'client_code' => env('HOSTING_CLIENT_CODE', 'defaultCode'),
     ],
 
     /*
