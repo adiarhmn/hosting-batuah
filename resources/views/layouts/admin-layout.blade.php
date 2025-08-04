@@ -42,7 +42,7 @@
                             </button>
                         </li>
                         <li class="d-none d-lg-block">
-                            <h5 class="mb-0">Good Morning, Alex</h5>
+                            <h5 class="mb-0">Selamat Datang Admin</h5>
                         </li>
                     </ul>
 
@@ -259,21 +259,13 @@
                 <!--- Sidemenu -->
                 <div id="sidebar-menu">
 
-                    <div class="logo-box">
-                        <a href="index.html" class="logo logo-light">
+                    <div class="logo-box mt-1">
+                        <a href="index.html" class="logo">
                             <span class="logo-sm">
-                                <img src="assets/images/logo-sm.png" alt="" height="22">
+                                <img src="assets/images/logo-light.png" alt="" height="40">
                             </span>
                             <span class="logo-lg">
-                                <img src="assets/images/logo-light.png" alt="" height="24">
-                            </span>
-                        </a>
-                        <a href="index.html" class="logo logo-dark">
-                            <span class="logo-sm">
-                                <img src="assets/images/logo-sm.png" alt="" height="22">
-                            </span>
-                            <span class="logo-lg">
-                                <img src="assets/images/logo-dark.png" alt="" height="24">
+                                <img src="assets/images/logo-light.png" alt="" height="68">
                             </span>
                         </a>
                     </div>
@@ -291,7 +283,7 @@
                                 <input type=hidden name=username value="{{ config('app.hosting.username') }}">
                                 <input type=hidden name=password value="{{ config('app.hosting.password') }}">
                             </form>
-                            <button class="btn btn-primary w-100" type="submit">
+                            <button class="btn btn-primary w-100 mt-3" type="submit">
                                 <i data-feather="server" width="16" height="16"></i>
                                 <span class="ms-2">Log In Hosting Panel</span>
                             </button>
