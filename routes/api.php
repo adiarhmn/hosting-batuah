@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DomainController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,9 +19,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::post('/send-verification-email', [AuthController::class, 'sendEmailVerification'])
+    ->middleware('throttle:6,1');
 
 // Contoh route API
 Route::get('/users', [UserController::class, 'listUsers']);
@@ -31,7 +32,3 @@ Route::get('/packages/{name}', [PackageController::class, 'packageDetail']);
 Route::get('/domains', [DomainController::class, 'domainList']);
 Route::get('/databases', [DomainController::class, 'databaseList']);
 Route::get('/databases/{name}', [DomainController::class, 'databaseDetail']);
-// Route::post('/users', [UserController::class, 'store']);
-// Route::get('/users/{id}', [UserController::class, 'show']);
-// Route::put('/users/{id}', [UserController::class, 'update']);
-// Route::delete('/users/{id}', [UserController::class, 'destroy']);

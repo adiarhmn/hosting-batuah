@@ -26,11 +26,24 @@
     <link rel="shortcut icon" href="{{ url('/') }}/assets/images/favicon.ico">
 
     <!-- App css -->
-    <link href="{{ url('/') }}/assets/css/app.min.css" rel="stylesheet" type="text/css" id="app-style" />
+    <link href="{{ url('/') }}/assets/css/app.css" rel="stylesheet" type="text/css" id="app-style" />
 
     <!-- Icons -->
     <link href="{{ url('/') }}/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
     <script src="{{ url('/') }}/assets/js/head.js"></script>
+
+
+    <style>
+        /* Ketika Input Fokut */
+        .form-group input.form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+        }
+
+        .bg-mesh-gradient {
+            background-image: linear-gradient(to right bottom, #ffffff, #e4e4e7, #c9c9cf, #aeb0b8, #9397a2);
+        }
+    </style>
 
 
 </head>
@@ -50,13 +63,13 @@
                                             <div class="mb-0 border-0 p-md-4 p-lg-0">
                                                 <div class="mb-4 p-0 text-lg-center text-center">
                                                     <div class="auth-brand">
-                                                        <a href="index.html" class="logo logo-light">
+                                                        <a href="{{ url('/') }}" class="logo logo-light">
                                                             <span class="logo-lg">
                                                                 <img src="{{ url('/') }}/assets/images/logo-light.png"
                                                                     alt="" height="68">
                                                             </span>
                                                         </a>
-                                                        <a href="index.html" class="logo logo-dark">
+                                                        <a href="{{ url('/') }}" class="logo logo-dark">
                                                             <span class="logo-lg">
                                                                 <img src="{{ url('/') }}/assets/images/logo-light.png"
                                                                     alt="" height="68">
@@ -66,8 +79,9 @@
                                                 </div>
 
                                                 <div class="auth-title-section mb-4 text-lg-start text-center">
-                                                    <h3 class="text-dark fw-semibold mb-0">
-                                                        Welcome Back
+                                                    <h3 class="text-dark fw-bold mb-0">
+                                                        Welcome to <span
+                                                            class="text-danger">{{ config('app.name') }}</span>
                                                     </h3>
                                                     <p class="text-muted fs-14 mb-0">
                                                         Sign in to continue to {{ config('app.name') }}.
@@ -75,25 +89,41 @@
                                                 </div>
 
                                                 <div class="pt-0">
-                                                    <form action="index.html" class="my-4">
+
+                                                    {{-- Login Form --}}
+                                                    <form action="{{ url('/login') }}" method="POST" class="my-4">
+                                                        @csrf
+
+                                                        {{-- Email --}}
                                                         <div class="form-group mb-3">
                                                             <label for="emailaddress" class="form-label">Email
                                                                 address</label>
-                                                            <input class="form-control" type="email" id="emailaddress"
-                                                                required="" placeholder="Enter your email">
+                                                            <div class="input-group">
+                                                                <span class="input-group-text"
+                                                                    id="basic-addon1">@</span>
+                                                                <input class="form-control" type="email"
+                                                                    id="emailaddress" required=""
+                                                                    placeholder="Enter your email" name="email"
+                                                                    value="{{ old('email') }}" autofocus
+                                                                    tabindex="1">
+                                                            </div>
                                                         </div>
 
+                                                        {{-- Password --}}
                                                         <div class="form-group mb-3">
                                                             <label for="password" class="form-label">Password</label>
                                                             <input class="form-control" type="password" required=""
-                                                                id="password" placeholder="Enter your password">
+                                                                id="password" placeholder="Enter your password"
+                                                                name="password" value="{{ old('password') }}"
+                                                                tabindex="2">
                                                         </div>
 
+                                                        {{-- Remember Me & Forgot Password  --}}
                                                         <div class="form-group d-flex mb-3">
                                                             <div class="col-sm-6">
                                                                 <div class="form-check">
                                                                     <input type="checkbox" class="form-check-input"
-                                                                        id="checkbox-signin" checked>
+                                                                        id="checkbox-signin" checked name="remember_me">
                                                                     <label class="form-check-label"
                                                                         for="checkbox-signin">Remember me</label>
                                                                 </div>
@@ -104,11 +134,13 @@
                                                             </div>
                                                         </div>
 
+                                                        {{-- Submit Button  --}}
                                                         <div class="form-group mb-0 row">
                                                             <div class="col-12">
                                                                 <div class="d-grid">
                                                                     <button class="btn btn-primary fw-semibold"
-                                                                        type="submit"> Log In </button>
+                                                                        type="submit" tabindex="3"> Log In
+                                                                    </button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -116,16 +148,17 @@
 
                                                     <div class="text-center text-muted">
                                                         <p class="mb-0">Don't have an account ?<a
-                                                                class='text-primary ms-2 fw-medium'
-                                                                href='auth-register.html'>Sing up</a></p>
+                                                                class='text-primary ms-1 fw-medium'
+                                                                href="{{ route('register') }}">Register</a></p>
                                                     </div>
 
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-lg-6 col-md-12 d-none d-lg-block">
+                                        <div class="col-lg-6 col-md-12 d-none d-lg-block p-0"
+                                            style="background-color: #a6a6a6;">
                                             <img src="{{ url('/') }}/assets/images/promosi-hosting-1.png"
-                                                alt="Hosting Batuah" class="img-fluid h-100">
+                                                alt="Hosting Batuah" class="w-100 h-100">
                                         </div>
                                     </div>
 
@@ -134,77 +167,6 @@
                         </div>
                     </div>
                 </div>
-
-                {{-- <div class="col-xl-7 d-none d-xl-inline-block">
-                    <div class="account-page-bg rounded-4">
-                        <div class="auth-user-review text-center">
-                            <div id="carouselExampleFade" class="carousel slide carousel-fade"
-                                data-bs-ride="carousel">
-                                <div class="carousel-inner">
-
-                                    <div class="carousel-item active">
-                                        <p class="prelead mb-2">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25"
-                                                viewBox="0 0 24 24">
-                                                <path fill="#ffffff"
-                                                    d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621c.537-.278 1.24-.375 1.929-.311c1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 0 1-3.5 3.5a3.87 3.87 0 0 1-2.748-1.179m10 0C13.553 16.227 13 15 13 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621c.537-.278 1.24-.375 1.929-.311c1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 0 1-3.5 3.5a3.87 3.87 0 0 1-2.748-1.179" />
-                                            </svg>
-                                            With Untitled, your support process can be as enjoyable as your product.
-                                            With it's this easy, customers keep coming back.
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25"
-                                                viewBox="0 0 24 24">
-                                                <path fill="#ffffff"
-                                                    d="M19.417 6.679C20.447 7.773 21 9 21 10.989c0 3.5-2.456 6.637-6.03 8.188l-.893-1.378c3.335-1.804 3.987-4.145 4.248-5.621c-.537.278-1.24.375-1.93.311c-1.804-.167-3.226-1.648-3.226-3.489a3.5 3.5 0 0 1 3.5-3.5c1.073 0 2.1.49 2.748 1.179m-10 0C10.447 7.773 11 9 11 10.989c0 3.5-2.456 6.637-6.03 8.188l-.893-1.378c3.335-1.804 3.987-4.145 4.247-5.621c-.537.278-1.24.375-1.929.311C4.591 12.323 3.17 10.842 3.17 9a3.5 3.5 0 0 1 3.5-3.5c1.073 0 2.1.49 2.748 1.179" />
-                                            </svg>
-                                        </p>
-                                        <h4 class="mb-1">Camilla Johnson</h4>
-                                        <p class="mb-0">Software Developer</p>
-                                    </div>
-
-                                    <div class="carousel-item">
-                                        <p class="prelead mb-2">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25"
-                                                viewBox="0 0 24 24">
-                                                <path fill="#ffffff"
-                                                    d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621c.537-.278 1.24-.375 1.929-.311c1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 0 1-3.5 3.5a3.87 3.87 0 0 1-2.748-1.179m10 0C13.553 16.227 13 15 13 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621c.537-.278 1.24-.375 1.929-.311c1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 0 1-3.5 3.5a3.87 3.87 0 0 1-2.748-1.179" />
-                                            </svg>
-                                            Pretty nice theme, hoping you guys could add more features to this. Keep up
-                                            the good work.
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25"
-                                                viewBox="0 0 24 24">
-                                                <path fill="#ffffff"
-                                                    d="M19.417 6.679C20.447 7.773 21 9 21 10.989c0 3.5-2.456 6.637-6.03 8.188l-.893-1.378c3.335-1.804 3.987-4.145 4.248-5.621c-.537.278-1.24.375-1.93.311c-1.804-.167-3.226-1.648-3.226-3.489a3.5 3.5 0 0 1 3.5-3.5c1.073 0 2.1.49 2.748 1.179m-10 0C10.447 7.773 11 9 11 10.989c0 3.5-2.456 6.637-6.03 8.188l-.893-1.378c3.335-1.804 3.987-4.145 4.247-5.621c-.537.278-1.24.375-1.929.311C4.591 12.323 3.17 10.842 3.17 9a3.5 3.5 0 0 1 3.5-3.5c1.073 0 2.1.49 2.748 1.179" />
-                                            </svg>
-                                        </p>
-                                        <h4 class="mb-1">Palak Awoo</h4>
-                                        <p class="mb-0">Lead Designer</p>
-                                    </div>
-
-                                    <div class="carousel-item">
-                                        <p class="prelead mb-2">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25"
-                                                viewBox="0 0 24 24">
-                                                <path fill="#ffffff"
-                                                    d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621c.537-.278 1.24-.375 1.929-.311c1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 0 1-3.5 3.5a3.87 3.87 0 0 1-2.748-1.179m10 0C13.553 16.227 13 15 13 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621c.537-.278 1.24-.375 1.929-.311c1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 0 1-3.5 3.5a3.87 3.87 0 0 1-2.748-1.179" />
-                                            </svg>
-                                            This is a great product, helped us a lot and very quick to work with and
-                                            implement.
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25"
-                                                viewBox="0 0 24 24">
-                                                <path fill="#ffffff"
-                                                    d="M19.417 6.679C20.447 7.773 21 9 21 10.989c0 3.5-2.456 6.637-6.03 8.188l-.893-1.378c3.335-1.804 3.987-4.145 4.248-5.621c-.537.278-1.24.375-1.93.311c-1.804-.167-3.226-1.648-3.226-3.489a3.5 3.5 0 0 1 3.5-3.5c1.073 0 2.1.49 2.748 1.179m-10 0C10.447 7.773 11 9 11 10.989c0 3.5-2.456 6.637-6.03 8.188l-.893-1.378c3.335-1.804 3.987-4.145 4.247-5.621c-.537.278-1.24.375-1.929.311C4.591 12.323 3.17 10.842 3.17 9a3.5 3.5 0 0 1 3.5-3.5c1.073 0 2.1.49 2.748 1.179" />
-                                            </svg>
-                                        </p>
-                                        <h4 class="mb-1">Laurent Smith</h4>
-                                        <p class="mb-0">Product designer</p>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> --}}
-
             </div>
         </div>
     </div>
@@ -214,15 +176,7 @@
     <!-- Vendor -->
     <script src="{{ url('/') }}/assets/libs/jquery/jquery.min.js"></script>
     <script src="{{ url('/') }}/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ url('/') }}/assets/libs/simplebar/simplebar.min.js"></script>
-    <script src="{{ url('/') }}/assets/libs/node-waves/waves.min.js"></script>
-    <script src="{{ url('/') }}/assets/libs/waypoints/lib/jquery.waypoints.min.js"></script>
-    <script src="{{ url('/') }}/assets/libs/jquery.counterup/jquery.counterup.min.js"></script>
     <script src="{{ url('/') }}/assets/libs/feather-icons/feather.min.js"></script>
-
-    <!-- App js-->
-    <script src="{{ url('/') }}/assets/js/app.js"></script>
-
 </body>
 
 </html>

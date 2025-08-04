@@ -23,9 +23,9 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->foreignId('role_id')->constrained('roles')->onDelete('cascade');
-            $table->string('username')->unique();
+            // $table->string('username')->unique();
             $table->string('email')->unique();
-            $table->string('phone')->nullable();
+            $table->string('phone')->unique()->nullable();
             $table->string('address')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
@@ -55,8 +55,8 @@ return new class extends Migration
     public function down(): void
     {
         // Drop the tables in reverse order
-        Schema::dropIfExists('roles');
         Schema::dropIfExists('users');
+        Schema::dropIfExists('roles');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
     }
