@@ -75,13 +75,22 @@ class AuthController extends Controller
     }
 
 
+    public function emailVerify(Request $request): \Illuminate\View\View | \Illuminate\Http\RedirectResponse
+    {
+        if (Auth::check() && Auth::user()->hasVerifiedEmail()) {
+            return redirect(Auth::user()->role->name . '/dashboard');
+        }
+        return view('auth.verify-email');
+    }
+
+
     public function sendEmailVerification(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = User::where('email', $request->email)->first();
 
         if (!$user) {
             return response()->json(['error' => 'User not found'], 404);
-        }elseif ($user->hasVerifiedEmail()) {
+        } elseif ($user->hasVerifiedEmail()) {
             return response()->json(['message' => 'Email already verified'], 200);
         }
 
@@ -91,5 +100,28 @@ class AuthController extends Controller
             'message' => 'Verification email sent successfully.',
             'status' => 'success',
         ]);
+    }
+
+    public function verifyEmail(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $user = User::find($request->id);
+
+        if (!$user || !hash_equals((string) $request->hash, sha1($user->getEmailForVerification()))) {
+            return redirect('/login')->with('error', 'Invalid verification link.');
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            return redirect('/login')->with('message', 'Email already verified.');
+        }
+
+        $user->markEmailAsVerified();
+
+        return redirect('/login')->with('success', 'Email verified successfully. You can now log in.');
+    }
+
+    public function logout(): \Illuminate\Http\RedirectResponse
+    {
+        Auth::logout();
+        return redirect('/login')->with('success', 'You have been logged out successfully.');
     }
 }
