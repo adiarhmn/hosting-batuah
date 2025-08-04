@@ -17,20 +17,27 @@ Route::group(['middleware' => 'guest'], function () {
     Route::post('/register', [AuthController::class, 'register']);
 });
 
+// Logout Route
+Route::get('/logout', function () {
+    Auth::logout();
+    return redirect('/login');
+})->middleware('auth')
+    ->name('logout');
+
 // Email Verification Notice Route
 Route::get('/email/verify', function () {
     if (Auth::check() && Auth::user()->hasVerifiedEmail()) {
-        return redirect('/dashboard');
+        return redirect(Auth::user()->role->name . '/dashboard');
     }
     return view('auth.verify-email');
 })
-->middleware(['auth', 'throttle:6,1'])
-->name('verification.notice');
+    ->middleware(['auth', 'throttle:6,1'])
+    ->name('verification.notice');
 
 // Email Verification Route
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
-    return redirect('/dashboard');
+    return redirect('/');
 })->middleware(['auth', 'signed'])->name('verification.verify');
 
 
@@ -41,8 +48,6 @@ Route::get('/', function () {
     ADMIN ROUTES ============================================>
 */
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'verified']], function () {
-
-
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
     })->name('admin.dashboard');

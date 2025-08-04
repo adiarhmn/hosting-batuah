@@ -51,10 +51,91 @@
             box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
         }
 
-        div.border-2.border-success {
+        /* div.border-2.border-success {
             border: 3px solid #18b169 !important;
+        } */
+
+        /* Avatar Gradient Styles */
+        .avatar-gradient {
+            background: linear-gradient(135deg, #18b169 0%, #0d6efd 100%);
+            border-radius: 50%;
+            padding: 3px;
+            position: relative;
+            animation: gradientShift 3s ease-in-out infinite;
         }
 
+        .avatar-gradient .avatar-title {
+            background: white !important;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% {
+                background: linear-gradient(135deg, #18b169 0%, #0d6efd 100%);
+            }
+            50% {
+                background: linear-gradient(135deg, #0d6efd 0%, #18b169 100%);
+            }
+        }
+
+        /* Icon Gradient Animation */
+        .avatar-gradient .mdi-email-check {
+            background: linear-gradient(135deg, #18b169 0%, #0d6efd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: iconGradientShift 3s ease-in-out infinite;
+        }
+
+        @keyframes iconGradientShift {
+            0%, 100% {
+                background: linear-gradient(135deg, #18b169 0%, #0d6efd 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+            50% {
+                background: linear-gradient(135deg, #0d6efd 0%, #18b169 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+        }
+
+        /* Button Gradient */
+        button.btn.btn-primary {
+            background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%);
+            border-color: #0d6efd;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        button.btn.btn-primary:hover {
+            background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+        }
+
+        button.btn.btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            border-color: #6c757d;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        button.btn.btn-secondary:hover {
+            background: linear-gradient(135deg, #495057 0%, #343a40 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
+
+
+        /* SweetAlert2 Custom Styles */
         div.swal2-popup.swal2-modal.swal2-show {
             border-radius: 1rem;
             font-family: 'Poppins', sans-serif;
@@ -114,7 +195,7 @@
                     <div class="card shadow-lg">
                         <div class="card-body p-4">
                             <div class="text-center mb-4">
-                                <div class="avatar-lg mx-auto">
+                                <div class="avatar-lg mx-auto avatar-gradient">
                                     <div class="avatar-title rounded-circle bg-light border-2 border-success">
                                         <i class="mdi mdi-email-check h2 mb-0 text-success"></i>
                                     </div>
@@ -229,7 +310,7 @@
             resendBtn.addEventListener('click', function() {
                 setTimeout(startCountdown, 100);
                 setTimeout(function() {
-                    // Simulate sending verification email
+                    sendVerificationEmail();
                 }, 1000);
             });
         });
