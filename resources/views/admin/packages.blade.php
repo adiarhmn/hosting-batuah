@@ -84,6 +84,11 @@
                                     @endforeach
                                 </tbody><!-- end tbody -->
                             </table><!-- end table -->
+
+                            {{-- Pagination --}}
+                            <div class="mt-3">
+                                {{ $packages->links('pagination::bootstrap-5') }}
+                            </div>
                         </div>
                     </div>
                 </div>

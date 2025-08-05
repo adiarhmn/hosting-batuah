@@ -2,11 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Domain;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
 class DomainController extends Controller
 {
+
+
+    public function showDomains(): \Illuminate\View\View
+    {
+        $domains = Domain::paginate(10);
+        return view('admin.domains', compact('domains'));
+    }
+
     public function domainList()
     {
         // dd('DomainController@domainList called');

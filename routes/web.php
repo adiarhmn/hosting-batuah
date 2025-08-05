@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DomainController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -25,12 +26,24 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'access:admin', 'ver
             Route::get('/{name}', 'showPackageDetail');
         });
 
-    Route::prefix('customers')
+    // Admin User Management
+    Route::prefix('users')
         ->controller(
             UserController::class
         )->group(function () {
-            Route::get('/', 'showCustomers');
-            Route::get('/sync', 'syncCustomers');
+            Route::get('/', 'showUsers');
+            Route::get('/{id}', 'showUserDetail');
+            Route::get('/sync', 'syncUsers');
+            Route::post('/create/domain', 'createDomain');
+        });
+
+    // Admin Domain Management
+    Route::prefix('domains')
+        ->controller(
+            DomainController::class
+        )->group(function () {
+            Route::get('/', 'showDomains');
+            Route::get('/{name}', 'domainDetail');
         });
 });
 

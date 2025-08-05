@@ -26,6 +26,22 @@
             background-color: rgb(92, 105, 114) !important;
             color: white !important;
         }
+
+        .input-group.is-invalid {
+            border-color: #dc3545 !important;
+            border-radius: 0.25rem !important;
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+        }
+
+        .form-control.is-invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+        }
+
+        div.invalid-feedback {
+            display: block;
+        }
+
     </style>
 
 
@@ -130,6 +146,25 @@
 
     <!-- App js-->
     <script src="{{ url('/') }}/assets/js/app.js"></script>
+
+    @yield('scripts')
+    <script>
+        $(document).ready(function() {
+            // Remove invalid class when user starts typing
+            $('.form-control.is-invalid').on('input', function() {
+                $(this).removeClass('is-invalid');
+                $(this).siblings('.invalid-feedback').hide();
+            });
+            $('.form-control.is-invalid, .form-select.is-invalid').on('input change', function() {
+                $(this).removeClass('is-invalid');
+                $(this).closest('.input-group').removeClass('is-invalid');
+                $(this).siblings('.invalid-feedback').hide();
+                $(this).closest('.input-group').siblings('.invalid-feedback').hide();
+            });
+
+
+        });
+    </script>
 
 </body>
 

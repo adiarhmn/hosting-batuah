@@ -9,13 +9,13 @@
                     <div class="card-header">
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
-                                <h5 class="card-title mb-0">Customers</h5>
-                                <p class="text-muted mb-0">List of all customers</p>
+                                <h5 class="card-title mb-0">Users</h5>
+                                <p class="text-muted mb-0">List of all users</p>
                             </div>
                             <div class="action-button">
                                 {{-- Sync --}}
-                                <a href="{{ url('admin/customers/sync') }}" class="btn btn-secondary ms-1">
-                                    <i class="mdi mdi-sync me-1"></i> Sync Customers
+                                <a href="{{ url('admin/users/sync') }}" class="btn btn-secondary ms-1">
+                                    <i class="mdi mdi-sync me-1"></i> Sync Users
                                 </a>
                             </div>
                         </div>
@@ -44,20 +44,20 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if ($customers->isEmpty())
+                                    @if ($users->isEmpty())
                                         <tr>
                                             <td colspan="6" class="text-center">
                                                 <div class="text-muted py-5">
-                                                    No customers found. Click Sync Customers to fetch from the server.
+                                                    No users found. Click Sync Users to fetch from the server.
                                                 </div>
                                             </td>
                                         </tr>
                                     @endif
 
-                                    @foreach ($customers as $item)
+                                    @foreach ($users as $item)
                                         <tr>
                                             <td>
-                                                {{ ($customers->currentPage() - 1) * $customers->perPage() + $loop->iteration }}
+                                                {{ ($users->currentPage() - 1) * $users->perPage() + $loop->iteration }}
                                             </td>
                                             <td>
                                                 {{ $item->name ?? '-' }}
@@ -70,15 +70,15 @@
                                             <td>
                                                 {{-- Action Buttons --}}
                                                 <div class="d-flex gap-2 justify-content-center">
-                                                    <a href="{{ url('admin/customers/' . $item->id) }}"
+                                                    <a href="{{ url('admin/users/' . $item->id) }}"
                                                         class="btn btn-sm btn-primary">
                                                         <i class="mdi mdi-eye"></i>
                                                     </a>
-                                                    <a href="{{ url('admin/customers/' . $item->id . '/edit') }}"
+                                                    <a href="{{ url('admin/users/' . $item->id . '/edit') }}"
                                                         class="btn btn-sm btn-warning">
                                                         <i class="mdi mdi-pencil"></i>
                                                     </a>
-                                                    <form action="{{ url('admin/customers/' . $item->id) }}" method="POST"
+                                                    <form action="{{ url('admin/users/' . $item->id) }}" method="POST"
                                                         class="d-inline">
                                                         @csrf
                                                         @method('DELETE')
@@ -95,7 +95,7 @@
 
                             {{-- Pagination --}}
                             <div class="mt-3">
-                                {{ $customers->links('pagination::bootstrap-5') }}
+                                {{ $users->links('pagination::bootstrap-5') }}
                             </div>
                         </div>
                     </div>

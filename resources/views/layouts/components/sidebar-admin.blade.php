@@ -52,11 +52,11 @@
                  </li>
 
                  <li class="menu-title mt-2">Data Master</li>
-                 {{-- Customer Menu --}}
+                 {{-- Users Menu --}}
                  <li>
-                     <a href="{{ url('admin/customers') }}" class="tp-link">
+                     <a href="{{ url('admin/users') }}" class="tp-link">
                          <i data-feather="users"></i>
-                         <span> Customers </span>
+                         <span> Users </span>
                      </a>
                  </li>
 

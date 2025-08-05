@@ -65,18 +65,11 @@ class AuthController extends Controller
                 'password' => bcrypt($request->password),
                 'role_id' => 2, // 2 Is the role ID for 'user' --- IGNORE
             ]);
-
-            // Membuat nama tanpa spasi untuk username
-
-            $username = str_replace(' ', '', strtolower($request->name)) . rand(1000, 9999);
-            $code = strtoupper(substr($username, 0, 3)) . rand(1000, 9999);
-
+            
             UserDetails::create([
                 'user_id' => $user->id,
                 'phone' => $request->phone,
                 'address' => $request->address,
-                'username' => $username,
-                'code' => $code,
             ]);
 
             Auth::login($user);

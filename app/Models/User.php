@@ -65,4 +65,12 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(UserDetails::class);
     }
+
+    /**
+     * Get the domains associated with the user.
+     */
+    public function domains()
+    {
+        return $this->hasMany(Domain::class);
+    }
 }
