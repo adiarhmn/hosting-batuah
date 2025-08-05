@@ -21,6 +21,13 @@
 
     <script src="{{ url('/') }}/assets/js/head.js"></script>
 
+    <style>
+        table.table-borderless th {
+            background-color: rgb(92, 105, 114) !important;
+            color: white !important;
+        }
+    </style>
+
 
 </head>
 

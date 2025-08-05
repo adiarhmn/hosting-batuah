@@ -8,13 +8,13 @@
                     <div class="card-header">
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
-                                <h5 class="card-title mb-0">Packages</h5>
-                                <p class="text-muted mb-0">List of all packages</p>
+                                <h5 class="card-title mb-0">Domains</h5>
+                                <p class="text-muted mb-0">List of all domains</p>
                             </div>
                             <div class="action-button">
                                 {{-- Sync --}}
-                                <a href="{{ url('admin/packages/sync') }}" class="btn btn-secondary ms-1">
-                                    <i class="mdi mdi-sync me-1"></i> Sync Packages
+                                <a href="{{ url('admin/domains/sync') }}" class="btn btn-secondary ms-1">
+                                    <i class="mdi mdi-sync me-1"></i> Sync Domains
                                 </a>
                             </div>
                         </div>
@@ -45,14 +45,14 @@
                                         </tr>
                                     @endif
 
-                                    @foreach ($packages as $item)
+                                    @foreach ($domains as $item)
                                         <tr>
                                             <td>
                                                 {{ $loop->iteration }}
                                             <td>
                                                 {{ $item->name_package ?? '-' }}
                                             </td>
-                                            <td class="text-uppercase">{{ $item->bandwidth ?? '-' }}</td>
+                                            <td>{{ $item->bandwidth ?? '-' }}</td>
                                             <td>
                                                 @php
                                                     $diskSize = $item->disk_space ? Number::fileSize($item->disk_space * 1024 * 1024) : '-';

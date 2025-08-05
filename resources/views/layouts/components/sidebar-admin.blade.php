@@ -44,15 +44,14 @@
                  </li>
 
                  {{-- Transactions --}}
-                    <li>
-                        <a href="{{ url('admin/transactions') }}" class="tp-link">
-                            <i data-feather="credit-card"></i>
-                            <span> Transactions </span>
-                        </a>
-                    </li>
+                 <li>
+                     <a href="{{ url('admin/transactions') }}" class="tp-link">
+                         <i data-feather="credit-card"></i>
+                         <span> Transactions </span>
+                     </a>
+                 </li>
 
                  <li class="menu-title mt-2">Data Master</li>
-
                  {{-- Customer Menu --}}
                  <li>
                      <a href="{{ url('admin/customers') }}" class="tp-link">
@@ -86,7 +85,7 @@
                  </li>
 
                  <li>
-                     <a href="apps-calendar.html" class="tp-link">
+                     <a href="{{ url('admin/domains') }}" class="tp-link">
                          <i data-feather="globe"></i>
                          <span> Domains </span>
                      </a>

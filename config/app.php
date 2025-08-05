@@ -23,6 +23,10 @@ return [
         'client_code' => env('HOSTING_CLIENT_CODE', 'defaultCode'),
     ],
 
+    'df' => [
+        'user_password' => env('DF_USER_PASSWORD', 'defaultPassword'),
+    ],
+
     /*
 
     */

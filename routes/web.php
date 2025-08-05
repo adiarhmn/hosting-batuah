@@ -30,6 +30,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'access:admin', 'ver
             UserController::class
         )->group(function () {
             Route::get('/', 'showCustomers');
+            Route::get('/sync', 'syncCustomers');
         });
 });
 
