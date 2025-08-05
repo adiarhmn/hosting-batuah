@@ -33,13 +33,9 @@ return new class extends Migration
         // User Details
         Schema::create('user_details', function (Blueprint $table) {
             $table->id();
-            $table->enum('status', ['active', 'inactive', 'suspended'])->default('active');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('username')->unique()->nullable();
-            $table->string('code')->unique()->nullable();
             $table->string('phone')->unique()->nullable();
             $table->string('address')->nullable();
-            $table->timestamp('expires_at')->nullable();
             $table->timestamps();
         });
 

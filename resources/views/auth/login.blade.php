@@ -40,6 +40,13 @@
             box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
         }
 
+        /* Form Error */
+        .form-group input.form-control.is-invalid {
+            border-color: #dc3545 !important;
+            border-radius: 0.25rem !important;
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+        }
+
         .bg-mesh-gradient {
             background-image: linear-gradient(to right bottom, #ffffff, #e4e4e7, #c9c9cf, #aeb0b8, #9397a2);
         }
@@ -101,21 +108,26 @@
                                                             <div class="input-group">
                                                                 <span class="input-group-text"
                                                                     id="basic-addon1">@</span>
-                                                                <input class="form-control" type="email"
-                                                                    id="emailaddress" required=""
+                                                                <input
+                                                                    class="form-control @error('email') is-invalid @enderror"
+                                                                    type="email" id="emailaddress"
                                                                     placeholder="Enter your email" name="email"
                                                                     value="{{ old('email') }}" autofocus
                                                                     tabindex="1">
+                                                                @error('email')
+                                                                    <span class="invalid-feedback" role="alert">
+                                                                        <strong>{{ $message }}</strong>
+                                                                    </span>
+                                                                @enderror
                                                             </div>
                                                         </div>
 
                                                         {{-- Password --}}
                                                         <div class="form-group mb-3">
                                                             <label for="password" class="form-label">Password</label>
-                                                            <input class="form-control" type="password" required=""
-                                                                id="password" placeholder="Enter your password"
-                                                                name="password" value="{{ old('password') }}"
-                                                                tabindex="2">
+                                                            <input class="form-control" type="password" id="password"
+                                                                placeholder="Enter your password" name="password"
+                                                                value="{{ old('password') }}" tabindex="2">
                                                         </div>
 
                                                         {{-- Remember Me & Forgot Password  --}}
@@ -123,7 +135,8 @@
                                                             <div class="col-sm-6">
                                                                 <div class="form-check">
                                                                     <input type="checkbox" class="form-check-input"
-                                                                        id="checkbox-signin" checked name="remember_me">
+                                                                        id="checkbox-signin" checked
+                                                                        name="remember_me">
                                                                     <label class="form-check-label"
                                                                         for="checkbox-signin">Remember me</label>
                                                                 </div>
@@ -177,6 +190,16 @@
     <script src="{{ url('/') }}/assets/libs/jquery/jquery.min.js"></script>
     <script src="{{ url('/') }}/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url('/') }}/assets/libs/feather-icons/feather.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Remove invalid class when user starts typing
+            $('.form-control.is-invalid').on('input', function() {
+                $(this).removeClass('is-invalid');
+                $(this).siblings('.invalid-feedback').hide();
+            });
+        });
+    </script>
 </body>
 
 </html>

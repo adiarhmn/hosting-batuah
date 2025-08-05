@@ -30,7 +30,7 @@ class AuthController extends Controller
             if (Auth::user()->hasVerifiedEmail()) {
                 // Authentication passed, redirect to the intended page
                 $userRole = Auth::user()->role->name;
-                return redirect()->intended("/$userRole/dashboard");
+                return redirect("/$userRole/dashboard");
             } else {
                 // User exists but email is not verified
                 return redirect('email/verify')->with('message', 'Please verify your email before proceeding.');
@@ -38,7 +38,7 @@ class AuthController extends Controller
         } else {
             // Authentication failed, redirect back with error
             return back()->withErrors([
-                'email' => 'The provided credentials do not match our records.',
+                'email' => 'The provided credentials do not match our records.'
             ]);
         }
     }

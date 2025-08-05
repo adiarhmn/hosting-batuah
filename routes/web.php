@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PackageController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -12,6 +13,17 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'access:admin', 'ver
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
     })->name('admin.dashboard');
+
+
+    // Admin Package Management
+    Route::prefix('packages')
+        ->controller(
+            PackageController::class
+        )->group(function () {
+            Route::get('/', 'showPackages');
+            Route::get('/sync', 'syncPackages');
+            Route::get('/{name}', 'showPackageDetail');
+        });
 
     Route::prefix('customers')
         ->controller(

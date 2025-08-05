@@ -178,7 +178,15 @@
     <script src="{{ url('/') }}/assets/libs/jquery/jquery.min.js"></script>
     <script src="{{ url('/') }}/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url('/') }}/assets/libs/feather-icons/feather.min.js"></script>
-
+    <script>
+        $(document).ready(function() {
+            // Remove invalid class when user starts typing
+            $('.form-control.is-invalid').on('input', function() {
+                $(this).removeClass('is-invalid');
+                $(this).siblings('.invalid-feedback').hide();
+            });
+        });
+    </script>
 
 </body>
 
