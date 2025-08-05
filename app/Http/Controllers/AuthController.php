@@ -29,7 +29,8 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $request->filled('remember_me'))) {
             if (Auth::user()->hasVerifiedEmail()) {
                 // Authentication passed, redirect to the intended page
-                return redirect()->intended('/dashboard');
+                $userRole = Auth::user()->role->name;
+                return redirect()->intended("/$userRole/dashboard");
             } else {
                 // User exists but email is not verified
                 return redirect('email/verify')->with('message', 'Please verify your email before proceeding.');
