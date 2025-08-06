@@ -67,7 +67,7 @@ class DomainController extends Controller
                 $domain->code = $code;
                 $domain->save();
                 DB::commit();
-                return redirect()->back()->with('message', 'Password regenerated successfully.');
+                return redirect()->back()->with('success', 'Password regenerated successfully.');
             } else {
                 DB::rollBack();
                 return redirect()->back()->withErrors(['error' => 'Failed to regenerate password.']);

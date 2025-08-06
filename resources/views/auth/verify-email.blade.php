@@ -304,7 +304,7 @@
 
             // Start countdown immediately when page loads
             startCountdown();
-            sendVerificationEmail();
+            // sendVerificationEmail();
 
             // Start countdown when button is clicked
             resendBtn.addEventListener('click', function() {

@@ -15,6 +15,8 @@
 
     <!-- App css -->
     <link href="{{ url('/') }}/assets/css/app.css" rel="stylesheet" type="text/css" id="app-style" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
 
     <!-- Icons -->
     <link href="{{ url('/') }}/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
@@ -47,7 +49,6 @@
             font-size: 0.9rem;
             color: #d63384;
         }
-
     </style>
 
 
@@ -152,6 +153,8 @@
 
     <!-- App js-->
     <script src="{{ url('/') }}/assets/js/app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
     @yield('scripts')
     <script>
@@ -171,6 +174,34 @@
 
         });
     </script>
+
+    {{-- Menampilkan Error dan Success jika ada session --}}
+    @if (session('error'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: '{{ session('error') }}',
+                confirmButtonText: 'OK',
+                customClass: {
+                    confirmButton: 'btn btn-danger'
+                }
+            });
+        </script>
+    @endif
+    @if (session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: '{{ session('success') }}',
+                confirmButtonText: 'OK',
+                customClass: {
+                    confirmButton: 'btn btn-success'
+                }
+            });
+        </script>
+    @endif
 
 </body>
 

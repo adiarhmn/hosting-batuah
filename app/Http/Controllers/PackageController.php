@@ -18,8 +18,6 @@ class PackageController extends Controller
 
     public function syncPackages()
     {
-        // $testPackageDetail = $this->API_packageDetail('batuah_lite');
-        // dd($testPackageDetail);
         DB::beginTransaction();
         try {
             $response = $this->API_packageList();
