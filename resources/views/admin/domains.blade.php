@@ -24,7 +24,7 @@
 
                         {{-- Action [Search, Filtering, etc] --}}
                         <form class="row mb-3">
-                            <div class="col-md-3">
+                            <div class="col-md-3 mb-3 mb-lg-0">
                                 <div>
                                     <div class="position-relative">
                                         <input type="text" name="search" class="form-control ps-2"
@@ -82,7 +82,7 @@
                                     @foreach ($domains as $item)
                                         <tr>
                                             <td>
-                                                {{ $loop->iteration }}
+                                                {{ $loop->iteration + ($domains->currentPage() - 1) * $domains->perPage() }}
                                             </td>
                                             <td>
                                                 @if ($item->status == 'active')

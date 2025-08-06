@@ -13,24 +13,18 @@
                                 <p class="text-muted mb-0">List of all users</p>
                             </div>
                             <div class="action-button">
-                                {{-- Sync --}}
-                                <a href="{{ url('admin/users/sync') }}" class="btn btn-secondary ms-1">
-                                    <i class="mdi mdi-sync me-1"></i> Sync Users
+                                {{-- New User --}}
+                                <a href="{{ url('admin/users/create') }}" class="btn btn-primary ms-1">
+                                    <i class="mdi mdi-plus me-1"></i> New User
                                 </a>
                             </div>
                         </div>
                     </div>
 
-                    <!--
-                                NOTE:
-                                - Card body contains the main content of the card.
-                            -->
                     <div class="card-body mt-0">
-                        <div class="table-responsive table-card mt-0">
-                            <!--
-                                            NOTE:
-                                            - The table is designed to be responsive and will adjust based on the screen size.
-                                        -->
+
+                        {{-- TABLE CONTENT --}}
+                        <div class="table-responsive table-card mt-0" style="min-height: 400px;">
                             <table
                                 class="table table-borderless table-centered align-middle table-nowrap mb-0 table-hover table-striped">
                                 <thead class="text-muted table-light mb-2">
@@ -67,26 +61,36 @@
                                                 {{ $item->userDetail->phone ?? '-' }}
                                             </td>
                                             <td>{{ $item->created_at ?? '-' }}</td>
-                                            <td>
+                                            <td class="text-center">
                                                 {{-- Action Buttons --}}
-                                                <div class="d-flex gap-2 justify-content-center">
-                                                    <a href="{{ url('admin/users/' . $item->id) }}"
-                                                        class="btn btn-sm btn-primary">
-                                                        <i class="mdi mdi-eye"></i>
-                                                    </a>
-                                                    <a href="{{ url('admin/users/' . $item->id . '/edit') }}"
-                                                        class="btn btn-sm btn-warning">
-                                                        <i class="mdi mdi-pencil"></i>
-                                                    </a>
-                                                    <form action="{{ url('admin/users/' . $item->id) }}" method="POST"
-                                                        class="d-inline">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-danger">
-                                                            <i class="mdi mdi-delete"></i>
-                                                        </button>
-                                                    </form>
-                                                    
+                                                <div class="dropdown">
+                                                    <button class="btn btn-light btn-sm" type="button"
+                                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="mdi mdi-dots-vertical"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-end"
+                                                        style="position: absolute; z-index: 9950;">
+                                                        {{-- View --}}
+                                                        <li>
+                                                            <a class="dropdown-item"
+                                                                href="{{ url('admin/users/' . $item->id) }}">
+                                                                <i class="mdi mdi-eye me-2"></i>View Details
+                                                            </a>
+                                                        </li>
+                                                        {{-- Edit --}}
+                                                        <li>
+                                                            <a class="dropdown-item"
+                                                                href="{{ url('admin/users/' . $item->id . '/edit') }}">
+                                                                <i class="mdi mdi-pencil me-2"></i>Edit
+                                                            </a>
+                                                        </li>
+                                                        {{-- Delete --}}
+                                                        <li>
+                                                            <a class="dropdown-item text-danger" href="#">
+                                                                <i class="mdi mdi-delete me-2"></i>Delete
+                                                            </a>
+                                                        </li>
+                                                    </ul>
                                                 </div>
                                             </td>
                                         </tr>
