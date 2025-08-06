@@ -12,7 +12,7 @@ class DomainController extends Controller
 
     public function showDomains(): \Illuminate\View\View
     {
-        $domains = Domain::paginate(10);
+        $domains = Domain::orderBy('created_at', 'desc')->paginate(10);
         return view('admin.domains', compact('domains'));
     }
 
@@ -83,5 +83,15 @@ class DomainController extends Controller
             'message' => 'Failed to retrieve database details',
             'response' => $response
         ], $response->status());
+    }
+
+
+    public function activateDomain($id, Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $domain = Domain::findOrFail($id);
+        $domain->status = 'active';
+        $domain->save();
+
+        return redirect()->back()->with('message', 'Domain activated successfully.');
     }
 }

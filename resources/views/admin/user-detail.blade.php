@@ -37,8 +37,8 @@
                     <div class="card-header">
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
-                                <h5 class="card-title mb-0">Domain {{ $user->name }}</h5>
-                                <p class="text-muted mb-0">List of all users</p>
+                                <h5 class="card-title mb-0">Domains of {{ $user->name }}</h5>
+                                <p class="text-muted mb-0">List of all domains owned by {{ $user->name }}</p>
                             </div>
                             <div class="action-button">
                                 {{-- Create Domain for This User --}}
@@ -131,11 +131,15 @@
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="mb-3">
-                                                                <label for="period" class="form-label">Active Period</label>
-                                                                <select class="form-select @error('period') is-invalid @enderror" id="period" name="period">
+                                                                <label for="period" class="form-label">Active
+                                                                    Period</label>
+                                                                <select
+                                                                    class="form-select @error('period') is-invalid @enderror"
+                                                                    id="period" name="period">
                                                                     <option value="">Select Active Period</option>
                                                                     @foreach ($periods as $period)
-                                                                        <option value="{{ $period }}" @if (old('period') == $period) selected @endif>
+                                                                        <option value="{{ $period }}"
+                                                                            @if (old('period') == $period) selected @endif>
                                                                             {{ $period }} days
                                                                         </option>
                                                                     @endforeach
@@ -164,8 +168,9 @@
 
                     <div class="card-body mt-0">
                         {{-- Table Content --}}
-                        <div class="table-responsive table-card mt-0">
-                            <table class="table table-borderless table-centered align-middle table-nowrap mb-0">
+                        <div class="table-responsive table-card mt-0" style="min-height: 400px;">
+                            <table
+                                class="table table-borderless table-centered align-middle table-nowrap mb-0 table-striped">
                                 <thead class="text-muted table-light">
                                     <tr>
                                         <th scope="col" class="cursor-pointer">No</th>
@@ -176,7 +181,7 @@
                                         <th scope="col" class="cursor-pointer text-center">Package</th>
                                         <th scope="col" class="cursor-pointer text-center">Expired At</th>
                                         <th scope="col" class="cursor-pointer">Status</th>
-                                        <th scope="col" class="cursor-pointer">Action</th>
+                                        <th scope="col" class="cursor-pointer text-center">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -196,7 +201,14 @@
                                                 {{ $loop->iteration }}
                                             </td>
                                             <td>
-                                                {{ $item->name ?? '-' }}
+                                                @if ($item->status == 'active')
+                                                    <a href="{{ 'http://' . $item->name }}" target="_blank">
+                                                        {{ $item->name }}
+                                                        <i class="mdi mdi-open-in-new"></i>
+                                                    </a>
+                                                @else
+                                                    {{ $item->name ?? '-' }}
+                                                @endif
                                             </td>
                                             <td>
                                                 {{ $item->username ?? '-' }}
@@ -243,6 +255,65 @@
                                                 @endphp
                                                 <span
                                                     class="badge {{ $statusClass }} fw-semibold text-uppercase">{{ $item->status }}</span>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex gap-2 justify-content-center">
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-light btn-sm" type="button"
+                                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <i class="mdi mdi-dots-vertical"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu dropdown-menu-end"
+                                                            style="position: absolute; z-index: 9950;">
+                                                            <li>
+                                                                @if ($item->status === 'pending' || $item->status === 'inactive')
+                                                                    <form
+                                                                        action="{{ url('admin/domains/activate/' . $item->id) }}"
+                                                                        method="POST" style="display: inline;">
+                                                                        @csrf
+                                                                        <button type="submit"
+                                                                            class="dropdown-item text-success">
+                                                                            <i class="mdi mdi-play me-2"></i>Activate
+                                                                        </button>
+                                                                    </form>
+                                                                @elseif($item->status === 'active')
+                                                                    <form
+                                                                        action="{{ 'https://' . $item->name . ':' . config('app.hosting.port') . '/CMD_LOGIN' }}"
+                                                                        method="POST" name="form">
+                                                                        <input type=hidden name=referer value="/">
+                                                                        <input type=hidden name=FAIL_URL value="">
+                                                                        <input type=hidden name=LOGOUT_URL
+                                                                            value="{{ 'http://' . $item->name . ':' . config('app.hosting.port') . '/logged_out.html' }}">
+                                                                        <input type=hidden name='username'
+                                                                            value="{{ $item->username }}">
+                                                                        <input type=hidden name='password'
+                                                                            value="{{ $item->code . config('app.hosting.client_code') }}">
+
+                                                                        <button type="submit"
+                                                                            class="dropdown-item text-primary">
+                                                                            <i class="mdi mdi-login me-2"></i>Login
+                                                                            Dashboard
+                                                                        </button>
+                                                                    </form>
+                                                                    <form
+                                                                        action="{{ url('admin/users/' . $item->id . '/deactivate') }}"
+                                                                        method="POST" style="display: inline;">
+                                                                        @csrf
+                                                                        <button type="submit"
+                                                                            class="dropdown-item text-danger">
+                                                                            <i class="mdi mdi-pause me-2"></i>Deactivate
+                                                                        </button>
+                                                                    </form>
+                                                                @endif
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item text-danger" href="#">
+                                                                    <i class="mdi mdi-delete me-2"></i>Delete
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
                                             </td>
 
                                         </tr>

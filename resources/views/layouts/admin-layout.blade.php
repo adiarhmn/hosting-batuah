@@ -42,6 +42,12 @@
             display: block;
         }
 
+        .code-font {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            color: #d63384;
+        }
+
     </style>
 
 

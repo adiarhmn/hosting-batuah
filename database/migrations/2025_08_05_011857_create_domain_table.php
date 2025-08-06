@@ -30,7 +30,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('name')->nullable();
             $table->string('url')->unique()->nullable();
-            $table->enum('status', ['active', 'inactive', 'suspended'])->default('inactive');
+            $table->enum('status', ['active', 'inactive', 'suspended', 'pending'])->default('pending');
             $table->string('code')->unique()->nullable();
             $table->string('username')->unique();
             $table->timestamp('expires_at')->nullable();

@@ -49,7 +49,12 @@ class UserController extends Controller
             return redirect()->back()->withErrors($e->validator)->withInput()->with('modal-show', true);
         }
 
+        DB::beginTransaction();
         try {
+            $code = strtoupper(substr($request->name, 0, 3)) . rand(1000, 9999);
+            $url = "https://" . config('app.hosting.host') . ":" . config('app.hosting.port') . "/CMD_API_ACCOUNT_USER";
+            $user = User::findOrFail($request->user_id);
+            $package = Package::findOrFail($request->package_id);
             Domain::create([
                 'user_id' => $request->user_id,
                 'name' => $request->name . "." . config('app.hosting.host', '.batuah.tech'),
@@ -57,12 +62,47 @@ class UserController extends Controller
                 'username' => $request->username,
                 'package_id' => $request->package_id,
                 'expires_at' => now()->addDays((int)$request->period),
-                'status' => 'inactive',
-                'code' => strtoupper(substr($request->name, 0, 3)) . rand(1000, 9999),
+                'status' => 'pending', // Pending sebelum domain di create di hosting
+                'code' => $code,
             ]);
+
+            // Hit API
+            $dataPost = [
+                'action' => 'create',
+                'add' => 'Submit',
+                'username' => $request->username,
+                'email' => $user->email,
+                'passwd' => $code . config('app.hosting.client_code'),
+                'passwd2' => $code . config('app.hosting.client_code'),
+                'domain' => $request->name . "." . config('app.hosting.host', '.batuah.tech'),
+                'package' => $package->name_package,
+                'ip' => config('app.hosting.ip'),
+                'notify' => 'yes'
+            ];
+            $response = Http::withOptions([])->withBasicAuth(
+                config('app.hosting.username'),
+                config('app.hosting.password')
+            )->post($url, $dataPost);
+            $responseBody = $response->body();
+
+            // Parse the response body to check for errors
+            parse_str($responseBody, $parsedResponse);
+
+            // Check if there's an error in the response
+            if (isset($parsedResponse['error']) && $parsedResponse['error'] == '1') {
+                DB::rollBack();
+                return redirect()->back()->withErrors([
+                    'name' => urldecode($parsedResponse['text'] ?? 'Account creation failed'),
+                    'details' => urldecode($parsedResponse['details'] ?? '')
+                ])->withInput()->with('modal-show', true);
+            }
+
+            // Show success message
+            DB::commit();
             return redirect()->back()->with('message', 'Domain created successfully.');
         } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => 'Failed to create domain: ' . $e->getMessage()])->withInput()->with('modal-show', true);
+            DB::rollBack();
+            return redirect()->back()->withErrors(['name' => 'Failed to create domain: ' . $e->getMessage()])->withInput()->with('modal-show', true);
         }
     }
 

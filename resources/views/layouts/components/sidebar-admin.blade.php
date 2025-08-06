@@ -76,14 +76,6 @@
                      </a>
                  </li>
 
-                 {{-- Database --}}
-                 <li>
-                     <a href="{{ url('databases') }}" class="tp-link">
-                         <i data-feather="database"></i>
-                         <span> Databases </span>
-                     </a>
-                 </li>
-
                  <li>
                      <a href="{{ url('admin/domains') }}" class="tp-link">
                          <i data-feather="globe"></i>
@@ -91,6 +83,14 @@
                      </a>
                  </li>
 
+                 <li class="menu-title mt-2">Personal</li>
+                 {{-- My Website --}}
+                 <li>
+                     <a href="{{ url('admin/website') }}" class="tp-link">
+                         <i data-feather="layout"></i>
+                         <span> My Website </span>
+                     </a>
+                 </li>
                  <li class="menu-title mt-2">Settings</li>
                  <li>
                      <a href="apps-calendar.html" class="tp-link">

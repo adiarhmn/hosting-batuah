@@ -50,17 +50,19 @@
 
                         {{-- Table Content --}}
                         <div class="table-responsive table-card mt-0">
-                            <table class="table table-borderless table-centered align-middle table-nowrap mb-0">
+                            <table
+                                class="table table-borderless table-centered align-middle table-nowrap mb-0 table-striped">
                                 <thead class="text-muted table-light">
                                     <tr>
                                         <th scope="col" class="cursor-pointer">No</th>
                                         <th scope="col" class="cursor-pointer">Domain</th>
+                                        <th scope="col" class="cursor-pointer text-center">Code</th>
                                         <th scope="col" class="cursor-pointer">Username</th>
-                                        <th scope="col" class="cursor-pointer">Bandwidth</th>
-                                        <th scope="col" class="cursor-pointer">Disk Space</th>
+                                        <th scope="col" class="cursor-pointer text-center">Bandwidth</th>
+                                        <th scope="col" class="cursor-pointer text-center">Disk Space</th>
                                         <th scope="col" class="cursor-pointer text-center">Package</th>
                                         <th scope="col" class="cursor-pointer text-center">Expired At</th>
-                                        <th scope="col" class="cursor-pointer">Status</th>
+                                        <th scope="col" class="cursor-pointer text-center">Status</th>
                                         <th scope="col" class="cursor-pointer">Action</th>
                                     </tr>
                                 </thead>
@@ -79,14 +81,28 @@
                                         <tr>
                                             <td>
                                                 {{ $loop->iteration }}
+                                            </td>
                                             <td>
-                                                {{ $item->name ?? '-' }}
+                                                @if ($item->status == 'active')
+                                                    <a href="{{ 'http://' . $item->name }}" target="_blank">
+                                                        {{ $item->name }}
+                                                        <i class="mdi mdi-open-in-new"></i>
+                                                    </a>
+                                                @else
+                                                    {{ $item->name ?? '-' }}
+                                                @endif
+                                            </td>
+                                            <td class="code-font text-center">
+                                                <span
+                                                    class="badge bg-secondary-subtle text-primary fw-semibold text-uppercase">
+                                                {{ $item->code ?? '-' }}
+                                                </span>
                                             </td>
                                             <td>
                                                 {{ $item->username ?? '-' }}
                                             </td>
-                                            <td class="text-uppercase">{{ $item->package->bandwidth ?? '-' }}</td>
-                                            <td>
+                                            <td class="text-uppercase text-center">{{ $item->package->bandwidth ?? '-' }}</td>
+                                            <td class="text-center">
                                                 @php
                                                     $diskSize = $item->package->disk_space
                                                         ? Number::fileSize($item->package->disk_space * 1024 * 1024)
@@ -105,7 +121,9 @@
                                             </td>
                                             <td class="text-center">
                                                 <span
-                                                    class="badge bg-secondary-subtle text-secondary fw-semibold text-uppercase">{{ $item->package->name_package ?? '-' }}</span>
+                                                    class="badge bg-secondary-subtle text-secondary fw-semibold text-uppercase">
+                                                    {{ $item->package->name_package ?? '-' }}
+                                                </span>
                                             </td>
                                             <td class="text-center">
                                                 @if ($item->expires_at)
@@ -116,7 +134,7 @@
                                                         class="badge bg-danger-subtle text-danger fw-semibold text-uppercase">Expired</span>
                                                 @endif
                                             </td>
-                                            <td>
+                                            <td class="text-center">
                                                 @php
                                                     $statusClass = match ($item->status) {
                                                         'active' => 'bg-primary-subtle text-primary',
@@ -128,7 +146,81 @@
                                                 <span
                                                     class="badge {{ $statusClass }} fw-semibold text-uppercase">{{ $item->status }}</span>
                                             </td>
+                                            <td>
+                                                <div class="d-flex gap-2 justify-content-center">
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-light btn-sm" type="button"
+                                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <i class="mdi mdi-dots-vertical"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu dropdown-menu-end"
+                                                            style="position: absolute; z-index: 9950;">
+                                                            <li>
+                                                                @if ($item->status === 'pending' || $item->status === 'inactive')
+                                                                    <form
+                                                                        action="{{ url('admin/domains/activate/' . $item->id) }}"
+                                                                        method="POST" style="display: inline;">
+                                                                        @csrf
+                                                                        <button type="submit"
+                                                                            class="dropdown-item text-success">
+                                                                            <i class="mdi mdi-play me-2"></i>Activate
+                                                                        </button>
+                                                                    </form>
+                                                                @elseif($item->status === 'active')
+                                                                    <form
+                                                                        action="{{ 'https://' . $item->name . ':' . config('app.hosting.port') . '/CMD_LOGIN' }}"
+                                                                        method="POST" name="form">
+                                                                        <input type=hidden name=referer value="/">
+                                                                        <input type=hidden name=FAIL_URL value="">
+                                                                        <input type=hidden name=LOGOUT_URL
+                                                                            value="{{ 'http://' . $item->name . ':' . config('app.hosting.port') . '/logged_out.html' }}">
+                                                                        <input type=hidden name='username'
+                                                                            value="{{ $item->username }}">
+                                                                        <input type=hidden name='password'
+                                                                            value="{{ $item->code . config('app.hosting.client_code') }}">
 
+                                                                        <button type="submit"
+                                                                            class="dropdown-item text-primary">
+                                                                            <i class="mdi mdi-login me-2"></i>Login
+                                                                            Dashboard
+                                                                        </button>
+                                                                    </form>
+                                                                    <form
+                                                                        action="{{ url('admin/users/' . $item->id . '/deactivate') }}"
+                                                                        method="POST" style="display: inline;">
+                                                                        @csrf
+                                                                        <button type="submit"
+                                                                            class="dropdown-item text-danger">
+                                                                            <i class="mdi mdi-pause me-2"></i>Deactivate
+                                                                        </button>
+                                                                    </form>
+                                                                @endif
+                                                            </li>
+
+                                                            {{-- Regenerate Password --}}
+                                                            <li>
+                                                                <a class="dropdown-item text-warning" href="#">
+                                                                    <i class="mdi mdi-refresh me-2"></i>Regenerate Password
+                                                                </a>
+                                                            </li>
+
+                                                            {{-- Get Password --}}
+                                                            <li>
+                                                                <a class="dropdown-item text-info" href="#">
+                                                                    <i class="mdi mdi-key me-2"></i>Get Password
+                                                                </a>
+                                                            </li>
+
+                                                            {{-- Delete --}}
+                                                            <li>
+                                                                <a class="dropdown-item text-danger" href="#">
+                                                                    <i class="mdi mdi-delete me-2"></i>Delete
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody><!-- end tbody -->

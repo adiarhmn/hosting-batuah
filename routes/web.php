@@ -44,6 +44,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'access:admin', 'ver
         )->group(function () {
             Route::get('/', 'showDomains');
             Route::get('/{name}', 'domainDetail');
+            Route::post('/activate/{id}', 'activateDomain');
         });
 });
 
