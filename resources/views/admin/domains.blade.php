@@ -23,33 +23,35 @@
                     <div class="card-body mt-0">
 
                         {{-- Action [Search, Filtering, etc] --}}
-                        <div class="row mb-3">
+                        <form class="row mb-3">
                             <div class="col-md-3">
-                                <form action="{{ url('admin/domains') }}" method="GET">
-                                    <div>
-                                        <input type="text" name="search" class="form-control"
-                                            placeholder="Search by domain or username" value="{{ request('search') }}">
+                                <div>
+                                    <div class="position-relative">
+                                        <input type="text" name="search" class="form-control ps-2"
+                                            placeholder="Search by domain or username" value="{{ request('search') }}"
+                                            onkeypress="if(event.key === 'Enter') this.form.submit()">
+                                        <button
+                                            class="btn btn-link position-absolute top-50 end-0 translate-middle-y me-1 text-muted">
+                                            <i class="mdi mdi-magnify"></i>
+                                        </button>
                                     </div>
-                                </form>
-                            </div>
-                            <div class="col-md-3">
-                                <select name="package" class="form-select" onchange="this.form.submit()">
-                                    <option value="">Filter by Package</option>
-                                    {{-- Add package options here --}}
-                                </select>
+                                </div>
                             </div>
                             <div class="col-md-2">
                                 <select name="status" class="form-select" onchange="this.form.submit()">
                                     <option value="">Filter by Status</option>
-                                    <option value="active">Active</option>
-                                    <option value="inactive">Inactive</option>
-                                    <option value="suspended">Suspended</option>
+                                    <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>
+                                        Active
+                                    </option>
+                                    <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>
+                                        Inactive
+                                    </option>
                                 </select>
                             </div>
-                        </div>
+                        </form>
 
                         {{-- Table Content --}}
-                        <div class="table-responsive table-card mt-0">
+                        <div class="table-responsive table-card mt-0" style="min-height: 400px;">
                             <table
                                 class="table table-borderless table-centered align-middle table-nowrap mb-0 table-striped">
                                 <thead class="text-muted table-light">
@@ -93,15 +95,15 @@
                                                 @endif
                                             </td>
                                             <td class="code-font text-center">
-                                                <span
-                                                    class="badge bg-secondary-subtle text-primary fw-semibold text-uppercase">
-                                                {{ $item->code ?? '-' }}
+                                                <span class="badge bg-secondary-subtle text-primary fw-semibold">
+                                                    {{ $item->code ?? '-' }}
                                                 </span>
                                             </td>
                                             <td>
                                                 {{ $item->username ?? '-' }}
                                             </td>
-                                            <td class="text-uppercase text-center">{{ $item->package->bandwidth ?? '-' }}</td>
+                                            <td class="text-uppercase text-center">{{ $item->package->bandwidth ?? '-' }}
+                                            </td>
                                             <td class="text-center">
                                                 @php
                                                     $diskSize = $item->package->disk_space
@@ -168,17 +170,9 @@
                                                                     </form>
                                                                 @elseif($item->status === 'active')
                                                                     <form
-                                                                        action="{{ 'https://' . $item->name . ':' . config('app.hosting.port') . '/CMD_LOGIN' }}"
+                                                                        action="{{ url('admin/domains/login/' . $item->id) }}"
                                                                         method="POST" name="form">
-                                                                        <input type=hidden name=referer value="/">
-                                                                        <input type=hidden name=FAIL_URL value="">
-                                                                        <input type=hidden name=LOGOUT_URL
-                                                                            value="{{ 'http://' . $item->name . ':' . config('app.hosting.port') . '/logged_out.html' }}">
-                                                                        <input type=hidden name='username'
-                                                                            value="{{ $item->username }}">
-                                                                        <input type=hidden name='password'
-                                                                            value="{{ $item->code . config('app.hosting.client_code') }}">
-
+                                                                        @csrf
                                                                         <button type="submit"
                                                                             class="dropdown-item text-primary">
                                                                             <i class="mdi mdi-login me-2"></i>Login
@@ -199,16 +193,16 @@
 
                                                             {{-- Regenerate Password --}}
                                                             <li>
-                                                                <a class="dropdown-item text-warning" href="#">
-                                                                    <i class="mdi mdi-refresh me-2"></i>Regenerate Password
-                                                                </a>
-                                                            </li>
-
-                                                            {{-- Get Password --}}
-                                                            <li>
-                                                                <a class="dropdown-item text-info" href="#">
-                                                                    <i class="mdi mdi-key me-2"></i>Get Password
-                                                                </a>
+                                                                <form
+                                                                    action="{{ url('admin/domains/regenerate-password/' . $item->id) }}"
+                                                                    method="POST" style="display: inline;">
+                                                                    @csrf
+                                                                    <button type="submit"
+                                                                        class="dropdown-item text-warning">
+                                                                        <i class="mdi mdi-refresh me-2"></i>Regenerate
+                                                                        Password
+                                                                    </button>
+                                                                </form>
                                                             </li>
 
                                                             {{-- Delete --}}

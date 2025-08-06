@@ -4,16 +4,78 @@ namespace App\Http\Controllers;
 
 use App\Models\Domain;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
 class DomainController extends Controller
 {
 
-
-    public function showDomains(): \Illuminate\View\View
+    public function showDomains(Request $request): \Illuminate\View\View
     {
-        $domains = Domain::orderBy('created_at', 'desc')->paginate(10);
+        $query = Domain::query();
+
+        // Filter by search term
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%')
+                ->orWhere('username', 'like', '%' . $request->search . '%');
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $domains = $query->orderBy('created_at', 'desc')->paginate(10);
         return view('admin.domains', compact('domains'));
+    }
+
+    public function loginDomain($id)
+    {
+        $domain = Domain::findOrFail($id);
+        if (!$domain) {
+            return redirect()->back()->withErrors(['error' => 'Domain not found.']);
+        }
+        $url = $domain->name . ":" . config('app.hosting.port');
+        $password = $domain->code . config('app.hosting.client_code');
+        $username = $domain->username;
+
+        return view('admin.domain-login', compact('url', 'username', 'password'));
+    }
+
+    public function regeneratePassword($id)
+    {
+        DB::beginTransaction();
+        try {
+            $domain = Domain::findOrFail($id);
+            $code = $this->getCode($domain->username);
+            $response = Http::withBasicAuth(
+                config('app.hosting.username'),
+                config('app.hosting.password')
+            )->post(config('app.hosting.url') . '/CMD_API_USER_PASSWD', [
+                // 'action' => 'modify',
+                'username' => $domain->username,
+                'passwd' => $code . config('app.hosting.client_code'),
+                'passwd2' => $code . config('app.hosting.client_code'),
+            ]);
+
+            $responseBody = $response->body();
+
+            // Parse the response body to check for errors
+            parse_str($responseBody, $parsedResponse);
+
+            if (isset($parsedResponse['error']) && $parsedResponse['error'] == '0') {
+                $domain->code = $code;
+                $domain->save();
+                DB::commit();
+                return redirect()->back()->with('message', 'Password regenerated successfully.');
+            } else {
+                DB::rollBack();
+                return redirect()->back()->withErrors(['error' => 'Failed to regenerate password.']);
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withErrors(['error' => 'Domain not found.']);
+        }
     }
 
     public function domainList()

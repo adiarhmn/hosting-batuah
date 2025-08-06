@@ -43,8 +43,11 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'access:admin', 'ver
             DomainController::class
         )->group(function () {
             Route::get('/', 'showDomains');
-            Route::get('/{name}', 'domainDetail');
+            Route::get('/{id}', 'domainDetail');
+            Route::post('/login/{id}', 'loginDomain');
             Route::post('/activate/{id}', 'activateDomain');
+            Route::post('/deactivate/{id}', 'deactivateDomain');
+            Route::post('/regenerate-password/{id}', 'regeneratePassword');
         });
 });
 

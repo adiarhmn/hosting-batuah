@@ -51,7 +51,7 @@ class UserController extends Controller
 
         DB::beginTransaction();
         try {
-            $code = strtoupper(substr($request->name, 0, 3)) . rand(1000, 9999);
+            $code = $this->getCode($request->username);
             $url = "https://" . config('app.hosting.host') . ":" . config('app.hosting.port') . "/CMD_API_ACCOUNT_USER";
             $user = User::findOrFail($request->user_id);
             $package = Package::findOrFail($request->package_id);

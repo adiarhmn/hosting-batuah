@@ -18,49 +18,8 @@ abstract class Controller
         return $this->list_periods;
     }
 
-    public function createDomainAccount(array $data): array
+    public function getCode($username)
     {
-        try {
-            $url = "https://" . config('app.hosting.host') . ":" . config('app.hosting.port') . "/CMD_API_ACCOUNT_USER";
-            $dataPost = [
-                'action' => 'create',
-                'add' => 'Submit',
-                'username' => $data['username'],
-                'email' => $data['email'],
-                'passwd' => $data['code'] . config('app.hosting.client_code'),
-                'passwd2' => $data['code'] . config('app.hosting.client_code'),
-                'domain' => $data['name'] . config('app.hosting.host', '.batuah.tech'),
-                'package' => $data['name_package'],
-                'ip' => config('app.hosting.ip'),
-                'notify' => 'yes'
-            ];
-            $response = Http::withOptions([])->withBasicAuth(
-                config('app.hosting.username'),
-                config('app.hosting.password')
-            )->post($url, $dataPost);
-            $responseBody = $response->body();
-
-            // Parse the response body to check for errors
-            parse_str($responseBody, $parsedResponse);
-
-            // Check if there's an error in the response
-            if (isset($parsedResponse['error']) && $parsedResponse['error'] == '1') {
-                return [
-                    'success' => false,
-                    'message' => urldecode($parsedResponse['text'] ?? 'Account creation failed'),
-                    'details' => urldecode($parsedResponse['details'] ?? ''),
-                    'response' => $parsedResponse,
-                    'status_code' => $response->status()
-                ];
-            }
-            return [
-                'success' => true,
-                'message' => 'Account created successfully',
-                'response' => $parsedResponse,
-                'status_code' => $response->status()
-            ];
-        } catch (\Exception $e) {
-            throw new \Exception('Domain account creation failed: ' . $e->getMessage(), $e->getCode() ?: 500);
-        }
+        return  strtoupper(substr($username, 0, 3)) . rand(1000, 9999) . strtoupper(substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'), 0, 4));
     }
 }
