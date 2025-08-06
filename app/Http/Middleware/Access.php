@@ -20,6 +20,7 @@ class Access
         if (!$roleUser) {
             return redirect('/login')->with('error', 'You must be logged in to access this section.');
         }
+        // dd($roleUser, $argument, Auth::check()); // Debugging line to check the role and argument
         if ($roleUser !== $argument) {
             return redirect("/{$roleUser}/dashboard")->with('error', 'You do not have access to this section.');
         }

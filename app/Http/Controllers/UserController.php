@@ -13,9 +13,18 @@ class UserController extends Controller
 {
 
     // Function to list all user with role 'user'
-    public function showUsers()
+    public function showUsers(Request $request)
     {
-        $users = User::where('role_id', 2)->orderBy('created_at', 'desc')->paginate(10);
+        $users = User::where('role_id', 2)
+            ->when($request->search, function ($query, $search) {
+                return $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('email', 'like', '%' . $search . '%');
+                });
+            })
+            ->withCount('domains')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
         return view('admin.users', compact('users'));
     }
 
@@ -103,6 +112,49 @@ class UserController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->withErrors(['name' => 'Failed to create domain: ' . $e->getMessage()])->withInput()->with('modal-show', true);
+        }
+    }
+
+    // Function to show the form for creating a new user
+    public function showCreateUserForm()
+    {
+        return view('admin.user-form', [
+            'action' => 'create',
+            'url' => url('admin/users/create'),
+        ]);
+    }
+
+    public function createUser(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:50',
+            'email' => 'required|string|email|max:150|unique:users',
+            'password' => 'required|string|min:8',
+            'phone' => 'required|string|max_digits:20|unique:user_details,phone|numeric',
+            'address' => 'required|string|max:155',
+            'role_id' => 'required|exists:roles,name',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => bcrypt($request->password),
+                'role_id' => $request->role_id === 'admin' ? 1 : 2, // 1 for admin, 2 for user
+            ]);
+
+            // Create user details
+            $user->userDetails()->create([
+                'phone' => $request->phone,
+                'address' => $request->address,
+            ]);
+
+            DB::commit();
+            return redirect('admin/users')->with('success', 'User created successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withErrors(['error' => 'Failed to create user: ' . $e->getMessage()])->withInput();
         }
     }
 

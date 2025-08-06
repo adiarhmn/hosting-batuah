@@ -23,16 +23,27 @@
 
                     <div class="card-body mt-0">
 
+                        {{-- Search Form --}}
+                        <form method="GET" action="{{ url('admin/users') }}" class="mb-3" style="max-width: 400px;">
+                            <div class="input-group">
+                                <input type="text" name="search" class="form-control"
+                                    placeholder="Search by name or email" value="{{ request('search') }}">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="mdi mdi-magnify"></i> Search
+                                </button>
+                            </div>
+                        </form>
+
                         {{-- TABLE CONTENT --}}
                         <div class="table-responsive table-card mt-0" style="min-height: 400px;">
                             <table
-                                class="table table-borderless table-centered align-middle table-nowrap mb-0 table-hover table-striped">
+                                class="table table-borderless table-centered align-middle table-nowrap mb-0 table-hover table-striped text-nowrap">
                                 <thead class="text-muted table-light mb-2">
                                     <tr>
                                         <th scope="col" class="cursor-pointer">No</th>
                                         <th scope="col" class="cursor-pointer">Name</th>
                                         <th scope="col" class="cursor-pointer">Email</th>
-                                        <th scope="col" class="cursor-pointer">Phone</th>
+                                        <th scope="col" class="cursor-pointer text-center">Total Domains</th>
                                         <th scope="col" class="cursor-pointer">Created At</th>
                                         <th scope="col" class="cursor-pointer text-center">Actions</th>
                                     </tr>
@@ -57,8 +68,8 @@
                                                 {{ $item->name ?? '-' }}
                                             </td>
                                             <td>{{ $item->email ?? '-' }}</td>
-                                            <td>
-                                                {{ $item->userDetail->phone ?? '-' }}
+                                            <td class="text-center">
+                                                {{ $item->domains_count ?? '-' }}
                                             </td>
                                             <td>{{ $item->created_at ?? '-' }}</td>
                                             <td class="text-center">

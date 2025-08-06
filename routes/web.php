@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Route;
 
 require __DIR__ . '/auth.php';
 
+Route::pattern('id', '[0-9]+');
+
 /*
     ADMIN ROUTES ============================================>
 */
@@ -33,6 +35,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'access:admin', 'ver
         )->group(function () {
             Route::get('/', 'showUsers');
             Route::get('/{id}', 'showUserDetail');
+            Route::get('/create', 'showCreateUserForm');
+            Route::post('/create', 'createUser');
             Route::get('/sync', 'syncUsers');
             Route::post('/create/domain', 'createDomain');
         });
