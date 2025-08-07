@@ -123,37 +123,67 @@ class DomainController extends Controller
         ], $response->status());
     }
 
-    public function databaseDetail($name)
+    public function domainDetail($id)
     {
-        $response = Http::withBasicAuth(
-            'ahmadbudi',
-            'Pelaihari88'
-        )->get(config('app.hosting.url') . '/CMD_API_DATABASES', [
-            'name' => $name
-        ]);
-
-        if ($response->successful()) {
-            parse_str($response->body(), $databaseDetails);
-            return response()->json([
-                'success' => true,
-                'database_details' => $databaseDetails
-            ]);
+        $domain = Domain::findOrFail($id);
+        if (!$domain) {
+            return redirect()->back()->withErrors(['error' => 'Domain not found.']);
         }
 
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to retrieve database details',
-            'response' => $response
-        ], $response->status());
+        // Fetch additional details from the API
+        try {
+
+            $apiDetails = $this->API_domainDetail($domain->username, $domain->name);
+            $subdomainDetails = $this->API_subdomains($domain->username, $domain->code . config('app.hosting.client_code'), $domain->name);
+        } catch (\Exception $e) {
+            return redirect()->back()->with(['error' => 'Failed to fetch domain details from the API.']);
+        }
+
+
+        return view('admin.domain-detail', compact('domain', 'apiDetails', 'subdomainDetails'));
     }
 
 
-    public function activateDomain($id, Request $request): \Illuminate\Http\RedirectResponse
+    public function activateDomain($id): \Illuminate\Http\RedirectResponse
     {
         $domain = Domain::findOrFail($id);
         $domain->status = 'active';
         $domain->save();
 
         return redirect()->back()->with('message', 'Domain activated successfully.');
+    }
+
+    public function deactivateDomain($id): \Illuminate\Http\RedirectResponse
+    {
+        dd('DomainController@deactivateDomain called');
+    }
+
+
+    private function API_domainDetail($username_domain, $domain = null)
+    {
+        $response = Http::withBasicAuth(
+            config('app.hosting.username'),
+            config('app.hosting.password')
+        )->get("https://" . $domain . ":" . config('app.hosting.port') . '/CMD_API_SHOW_USER_USAGE', [
+            'user' => $username_domain
+        ]);
+        return $response->successful() ?
+            tap([], fn(&$domain) => parse_str($response->body(), $domain)) :
+            null;
+    }
+
+    private function API_subdomains($username_domain, $password, $domain)
+    {
+        $response = Http::withBasicAuth(
+            $username_domain,
+            $password
+        )->get("https://" . $domain . ":" . config('app.hosting.port') . '/CMD_API_SUBDOMAINS', [
+            'domain' => $domain
+        ]);
+        return $response->successful() ?
+            tap([], fn(&$subdomain) => parse_str($response->body(), $subdomain)) :
+            [
+                'error' => 'Failed to retrieve subdomains',
+            ];
     }
 }

@@ -158,37 +158,13 @@
                                                         <ul class="dropdown-menu dropdown-menu-end"
                                                             style="position: absolute; z-index: 9950;">
                                                             <li>
-                                                                @if ($item->status === 'pending' || $item->status === 'inactive')
-                                                                    <form
-                                                                        action="{{ url('admin/domains/activate/' . $item->id) }}"
-                                                                        method="POST" style="display: inline;">
-                                                                        @csrf
-                                                                        <button type="submit"
-                                                                            class="dropdown-item text-success">
-                                                                            <i class="mdi mdi-play me-2"></i>Activate
-                                                                        </button>
-                                                                    </form>
-                                                                @elseif($item->status === 'active')
-                                                                    <form
-                                                                        action="{{ url('admin/domains/login/' . $item->id) }}"
-                                                                        method="POST" name="form">
-                                                                        @csrf
-                                                                        <button type="submit"
-                                                                            class="dropdown-item text-primary">
-                                                                            <i class="mdi mdi-login me-2"></i>Login
-                                                                            Dashboard
-                                                                        </button>
-                                                                    </form>
-                                                                    <form
-                                                                        action="{{ url('admin/users/' . $item->id . '/deactivate') }}"
-                                                                        method="POST" style="display: inline;">
-                                                                        @csrf
-                                                                        <button type="submit"
-                                                                            class="dropdown-item text-danger">
-                                                                            <i class="mdi mdi-pause me-2"></i>Deactivate
-                                                                        </button>
-                                                                    </form>
-                                                                @endif
+                                                                {{-- Detail --}}
+                                                                <form action="{{ url('admin/domains/' . $item->id) }}"
+                                                                    method="GET" style="display: inline;">
+                                                                    <button type="submit" class="dropdown-item">
+                                                                        <i class="mdi mdi-eye me-2"></i>Detail
+                                                                    </button>
+                                                                </form>
                                                             </li>
 
                                                             {{-- See User --}}
@@ -197,6 +173,40 @@
                                                                     href="{{ url('admin/users/' . $item->user_id) }}">
                                                                     <i class="mdi mdi-account me-2"></i>View User
                                                                 </a>
+                                                            </li>
+
+                                                            {{-- Activate and Deactivate --}}
+                                                            @if ($item->status === 'pending' || $item->status === 'inactive')
+                                                                <form
+                                                                    action="{{ url('admin/domains/activate/' . $item->id) }}"
+                                                                    method="POST" style="display: inline;">
+                                                                    @csrf
+                                                                    <button type="submit"
+                                                                        class="dropdown-item text-success">
+                                                                        <i class="mdi mdi-play me-2"></i>Activate
+                                                                    </button>
+                                                                </form>
+                                                            @elseif($item->status === 'active')
+                                                                <form
+                                                                    action="{{ url('admin/domains/login/' . $item->id) }}"
+                                                                    method="POST" name="form">
+                                                                    @csrf
+                                                                    <button type="submit"
+                                                                        class="dropdown-item text-primary">
+                                                                        <i class="mdi mdi-login me-2"></i>Login
+                                                                        Dashboard
+                                                                    </button>
+                                                                </form>
+                                                                <form
+                                                                    action="{{ url('admin/users/' . $item->id . '/deactivate') }}"
+                                                                    method="POST" style="display: inline;">
+                                                                    @csrf
+                                                                    <button type="submit"
+                                                                        class="dropdown-item text-danger">
+                                                                        <i class="mdi mdi-pause me-2"></i>Deactivate
+                                                                    </button>
+                                                                </form>
+                                                            @endif
                                                             </li>
 
                                                             {{-- Regenerate Password --}}
