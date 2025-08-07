@@ -191,6 +191,14 @@
                                                                 @endif
                                                             </li>
 
+                                                            {{-- See User --}}
+                                                            <li>
+                                                                <a class="dropdown-item"
+                                                                    href="{{ url('admin/users/' . $item->user_id) }}">
+                                                                    <i class="mdi mdi-account me-2"></i>View User
+                                                                </a>
+                                                            </li>
+
                                                             {{-- Regenerate Password --}}
                                                             <li>
                                                                 <form

@@ -72,7 +72,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="phone" class="form-label">Phone</label>
                                     <input type="text" class="form-control @error('phone') is-invalid @enderror"
-                                        id="phone" name="phone" value="{{ old('phone', $user->phone ?? '') }}">
+                                        id="phone" name="phone" value="{{ old('phone', $user->userDetails->phone ?? '') }}">
                                     @error('phone')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -84,11 +84,11 @@
                                     <select class="form-select @error('role_id') is-invalid @enderror" id="role_id"
                                         name="role_id">
                                         <option value="">Select Role</option>
-                                        <option value="admin"
-                                            {{ old('role_id', $user->role_id ?? '') == 'admin' ? 'selected' : '' }}>Admin
+                                        <option value="1"
+                                            {{ old('role_id', $user->role_id ?? '') == '1' ? 'selected' : '' }}>Admin
                                         </option>
-                                        <option value="user"
-                                            {{ old('role_id', $user->role_id ?? '') == 'user' ? 'selected' : '' }}>User
+                                        <option value="2"
+                                            {{ old('role_id', $user->role_id ?? '') == '2' ? 'selected' : '' }}>User
                                         </option>
                                     </select>
                                     @error('role_id')
@@ -99,7 +99,7 @@
                                 {{-- Address Field --}}
                                 <div class="col-md-6 mb-3">
                                     <label for="address" class="form-label">Address</label>
-                                    <textarea class="form-control @error('address') is-invalid @enderror" id="address" name="address" rows="1">{{ old('address', $user->address ?? '') }}</textarea>
+                                    <textarea class="form-control @error('address') is-invalid @enderror" id="address" name="address" rows="1">{{ old('address', $user->userDetails->address ?? '') }}</textarea>
                                     @error('address')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror

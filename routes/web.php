@@ -37,6 +37,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'access:admin', 'ver
             Route::get('/{id}', 'showUserDetail');
             Route::get('/create', 'showCreateUserForm');
             Route::post('/create', 'createUser');
+            Route::get('edit/{id}', 'showEditUserForm');
+            Route::put('edit/{id}', 'updateUser');
+            Route::get('/activate/{id}', 'activateUser');
+            Route::get('/deactivate/{id}', 'deactivateUser');
             Route::get('/sync', 'syncUsers');
             Route::post('/create/domain', 'createDomain');
         });

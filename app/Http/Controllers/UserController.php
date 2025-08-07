@@ -132,7 +132,7 @@ class UserController extends Controller
             'password' => 'required|string|min:8',
             'phone' => 'required|string|max_digits:20|unique:user_details,phone|numeric',
             'address' => 'required|string|max:155',
-            'role_id' => 'required|exists:roles,name',
+            'role_id' => 'required|exists:roles,id',
         ]);
 
         DB::beginTransaction();
@@ -141,13 +141,14 @@ class UserController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => bcrypt($request->password),
-                'role_id' => $request->role_id === 'admin' ? 1 : 2, // 1 for admin, 2 for user
+                'role_id' => $request->role_id, // 1 for admin, 2 for user
             ]);
 
             // Create user details
             $user->userDetails()->create([
                 'phone' => $request->phone,
                 'address' => $request->address,
+                'status' => 'active', // Default status
             ]);
 
             DB::commit();
@@ -155,6 +156,56 @@ class UserController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->withErrors(['error' => 'Failed to create user: ' . $e->getMessage()])->withInput();
+        }
+    }
+
+    // Function to show the form for editing a user
+    public function showEditUserForm($id)
+    {
+        $user = User::findOrFail($id);
+        return view('admin.user-form', [
+            'action' => 'edit',
+            'url' => url('admin/users/edit/' . $id),
+            'user' => $user,
+        ]);
+    }
+
+    public function updateUser(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        $user_details_id = $user->userDetails->id ?? null;
+
+        $request->validate([
+            'name' => 'required|string|max:50',
+            'email' => 'required|string|email|max:150|unique:users,email,' . $user->id,
+            'phone' => 'required|string|max_digits:20|unique:user_details,phone,' . $user_details_id . '|numeric',
+            'address' => 'required|string|max:155',
+            'role_id' => 'required|exists:roles,id',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $user->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'role_id' => $request->role_id,
+            ]);
+
+            // Update user details
+            $user->userDetails()->updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'phone' => $request->phone,
+                    'address' => $request->address,
+
+                ]
+            );
+
+            DB::commit();
+            return redirect('admin/users')->with('success', 'User updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withErrors(['error' => 'Failed to update user: ' . $e->getMessage()])->withInput();
         }
     }
 
@@ -215,6 +266,49 @@ class UserController extends Controller
             return back()->withErrors(['error' => 'Failed to sync users: ' . $e->getMessage()]);
         }
     }
+
+
+    public function activateUser($id)
+    {
+        DB::beginTransaction();
+        try {
+            $user = User::findOrFail($id);
+
+            // Update user status to active
+            $user->userDetails()->updateOrCreate(
+                ['user_id' => $user->id],
+                ['status' => 'active']
+            );
+
+            DB::commit();
+            return redirect()->back()->with('success', 'User activated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withErrors(['error' => 'Failed to activate user: ' . $e->getMessage()]);
+        }
+    }
+
+    public function deactivateUser($id)
+    {
+        DB::beginTransaction();
+        try {
+            $user = User::findOrFail($id);
+
+            // Update user status to inactive
+            $user->userDetails()->updateOrCreate(
+                ['user_id' => $user->id],
+                ['status' => 'inactive']
+            );
+
+            DB::commit();
+            return redirect()->back()->with('success', 'User deactivated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withErrors(['error' => 'Failed to deactivate user: ' . $e->getMessage()]);
+        }
+    }
+
+
 
     /*
         NOTE:

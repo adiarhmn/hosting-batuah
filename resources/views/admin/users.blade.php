@@ -43,7 +43,9 @@
                                         <th scope="col" class="cursor-pointer">No</th>
                                         <th scope="col" class="cursor-pointer">Name</th>
                                         <th scope="col" class="cursor-pointer">Email</th>
+                                        <th scope="col" class="cursor-pointer">Phone</th>
                                         <th scope="col" class="cursor-pointer text-center">Total Domains</th>
+                                        <th scope="col" class="cursor-pointer text-center">Status</th>
                                         <th scope="col" class="cursor-pointer">Created At</th>
                                         <th scope="col" class="cursor-pointer text-center">Actions</th>
                                     </tr>
@@ -67,9 +69,28 @@
                                             <td>
                                                 {{ $item->name ?? '-' }}
                                             </td>
-                                            <td>{{ $item->email ?? '-' }}</td>
+                                            <td>
+                                                {{ $item->email ?? '-' }}
+                                                @if ($item->email_verified_at)
+                                                    <i class="mdi mdi-check-circle text-primary ms-1"
+                                                        title="Email Verified"></i>
+                                                @else
+                                                    <i class="mdi mdi-alert-circle text-warning ms-1"
+                                                        title="Email Not Verified"></i>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                {{ $item->userDetails->phone ?? '-' }}
+                                            </td>
                                             <td class="text-center">
                                                 {{ $item->domains_count ?? '-' }}
+                                            </td>
+                                            <td class="text-center">
+                                                @if ($item->userDetails?->status == 'active')
+                                                    <span class="badge bg-success">Active</span>
+                                                @else
+                                                    <span class="badge bg-danger">Inactive</span>
+                                                @endif
                                             </td>
                                             <td>{{ $item->created_at ?? '-' }}</td>
                                             <td class="text-center">
@@ -91,16 +112,27 @@
                                                         {{-- Edit --}}
                                                         <li>
                                                             <a class="dropdown-item"
-                                                                href="{{ url('admin/users/' . $item->id . '/edit') }}">
+                                                                href="{{ url('admin/users/edit/' . $item->id) }}">
                                                                 <i class="mdi mdi-pencil me-2"></i>Edit
                                                             </a>
                                                         </li>
-                                                        {{-- Delete --}}
-                                                        <li>
-                                                            <a class="dropdown-item text-danger" href="#">
-                                                                <i class="mdi mdi-delete me-2"></i>Delete
-                                                            </a>
-                                                        </li>
+                                                        {{-- Active --}}
+                                                        @if ($item->userDetails?->status == 'active')
+                                                            <li>
+                                                                <a class="dropdown-item text-danger"
+                                                                    href="{{ url('admin/users/deactivate/' . $item->id) }}">
+                                                                    <i class="mdi mdi-close me-2"></i>Deactivate
+                                                                </a>
+                                                            </li>
+                                                        @else
+                                                            <li>
+                                                                <a class="dropdown-item text-success" href="{{ url('admin/users/activate/' . $item->id) }}">
+                                                                    <i class="mdi mdi-check me-2"></i>Activate
+                                                                </a>
+                                                            </li>
+                                                        @endif
+
+
                                                     </ul>
                                                 </div>
                                             </td>

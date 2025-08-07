@@ -9,6 +9,7 @@ class UserDetails extends Model
     protected $fillable = [
         'phone',
         'address',
+        'status', // New field added for user status
     ];
 
 
