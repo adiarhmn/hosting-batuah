@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Domain;
+use App\Models\Package;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -29,6 +31,83 @@ class DomainController extends Controller
         return view('admin.domains', compact('domains'));
     }
 
+    public function syncDomains()
+    {
+        $domains = $this->API_listUsers();
+        if (!$domains) {
+            return redirect()->back()->withErrors(['error' => 'Failed to sync domains from the API.']);
+        }
+
+        DB::beginTransaction();
+        try {
+            foreach ($domains as $username) {
+                Domain::updateOrCreate(
+                    ['username' => $username],
+                    [
+                        'username' => $username,
+                    ]
+                );
+            }
+            DB::commit();
+            return redirect()->back()->with('success', 'Domains synced successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            dd($e->getMessage());
+            return redirect()->back()->with(['error' => 'Failed to sync domains: ' . $e->getMessage()]);
+        }
+    }
+
+    public function syncByID($id)
+    {
+        DB::beginTransaction();
+        try {
+            $domain = Domain::findOrFail($id);
+            $response = $this->API_getUserDetail($domain->username);
+            if (!$response) {
+                DB::rollBack();
+                return redirect()->back()->with(['error' => 'Failed to sync domain details from the API.']);
+            }
+            // Create User Default Domain
+            if (!$domain->user_id) {
+                $user = User::create([
+                    'name' => ucwords($domain->username) . random_int(1000, 9999),
+                    'email' => $domain->username . '@' . config('app.hosting.host'),
+                    'password' => bcrypt($domain->code . config('app.hosting.client_code')),
+                    'role_id' => 2, // Assuming 2 is the role ID for 'user'
+                ]);
+            } else {
+                $user = User::findOrFail($domain->user_id);
+            }
+
+            // Create or update the package
+            $package = Package::updateOrCreate(
+                ['name_package' => $response['package']],
+                [
+                    'name_package' => $response['package'],
+                    'status' => 'active',
+                ]
+            );
+
+            $code = $this->getCode($domain->username);
+            $domain->update([
+                'user_id' => $user->id,
+                'name' => $response['domain'],
+                'package_id' => $package->id,
+                'url' => "https://" . $response['domain'] . ":" . config('app.hosting.port'),
+                'status' => $response['account'] === 'ON' ? 'active' : 'suspended',
+                'code' => $code,
+                'username' => $domain->username,
+                'expires_at' => now()->addDays(7),
+            ]);
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Domain synced successfully.');
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+            return redirect()->back()->withErrors(['error' => 'Failed to sync domain by ID: ' . $e->getMessage()]);
+        }
+    }
+
     public function loginDomain($id)
     {
         $domain = Domain::findOrFail($id);
@@ -39,6 +118,7 @@ class DomainController extends Controller
         $password = $domain->code . config('app.hosting.client_code');
         $username = $domain->username;
 
+        // dd("https://" . $url . "/CMD_API_LOGIN?user=" . $username . "&passwd=" . $password);
         return view('admin.domain-login', compact('url', 'username', 'password'));
     }
 
@@ -78,28 +158,7 @@ class DomainController extends Controller
         }
     }
 
-    public function domainList()
-    {
-        // dd('DomainController@domainList called');
-        $response = Http::withBasicAuth(
-            config('app.hosting.username'),
-            config('app.hosting.password')
-        )->get(config('app.hosting.url') . '/CMD_API_SUBDOMAINS', [
-            'domain' => config('app.hosting.host')
-        ]);
-        if ($response->successful()) {
-            parse_str($response->body(), $domains);
-            return response()->json([
-                'success' => true,
-                'domains' => $domains
-            ]);
-        }
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to retrieve domain list',
-            'response' => $response
-        ], $response->status());
-    }
+
 
     public function databaseList()
     {
@@ -133,7 +192,7 @@ class DomainController extends Controller
         $domainName = $domain->status == 'active' ? $domain->name : config('app.hosting.host');
         // Fetch additional details from the API
         try {
-            $apiDetails = $this->API_domainDetail($domain->username, $domainName);
+            $apiDetails = $this->API_domainUsageDetail($domain->username, $domainName);
             $subdomainDetails = $this->API_subdomains($domain->username, $domain->code . config('app.hosting.client_code'), $domainName);
         } catch (\Exception $e) {
             return redirect()->back()->with(['error' => 'Failed to fetch domain details from the API.']);
@@ -185,7 +244,24 @@ class DomainController extends Controller
         }
     }
 
-    private function API_domainDetail($username_domain, $domain = null)
+    // ====================================================================================
+    // API Calls Methods
+
+    public function API_domainList()
+    {
+        // dd('DomainController@domainList called');
+        $response = Http::withBasicAuth(
+            config('app.hosting.username'),
+            config('app.hosting.password')
+        )->get(config('app.hosting.url') . '/CMD_API_SUBDOMAINS', [
+            'domain' => config('app.hosting.host')
+        ]);
+        return $response->successful() ?
+            tap([], fn(&$domains) => parse_str($response->body(), $domains)) :
+            null;
+    }
+
+    private function API_domainUsageDetail($username_domain, $domain = null)
     {
         $response = Http::withBasicAuth(
             config('app.hosting.username'),

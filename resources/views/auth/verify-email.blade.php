@@ -249,7 +249,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const resendBtn = document.getElementById('resend-verification');
-            let timeLeft = 60;
+            let timeLeft = 5;
             let countdownTimer;
 
             function startCountdown() {

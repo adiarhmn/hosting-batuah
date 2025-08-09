@@ -27,14 +27,14 @@ return new class extends Migration
         // Create the domain table
         Schema::create('domain', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->string('name')->nullable();
             $table->string('url')->unique()->nullable();
-            $table->enum('status', ['active', 'inactive', 'suspended', 'pending'])->default('pending');
+            $table->enum('status', ['active', 'unknown', 'suspended', 'pending'])->default('unknown');
             $table->string('code')->unique()->nullable();
             $table->string('username')->unique();
             $table->timestamp('expires_at')->nullable();
-            $table->foreignId('package_id')->constrained('package')->onDelete('cascade');
+            $table->foreignId('package_id')->nullable()->constrained('package')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -52,6 +52,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'access:admin', 'ver
         )->group(function () {
             Route::get('/', 'showDomains');
             Route::get('/{id}', 'domainDetail');
+            Route::get('/sync', 'syncDomains');
+            Route::get('/sync/{id}', 'syncByID');
             Route::post('/login/{id}', 'loginDomain');
             Route::post('/activate/{id}', 'activateDomain');
             Route::post('/suspend/{id}', 'suspendDomain');

@@ -39,12 +39,18 @@
                             </div>
                             <div class="col-md-2">
                                 <select name="status" class="form-select" onchange="this.form.submit()">
-                                    <option value="">Filter by Status</option>
+                                    <option value="">All Status</option>
                                     <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>
                                         Active
                                     </option>
-                                    <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>
-                                        Inactive
+                                    <option value="suspended" {{ request('status') == 'suspended' ? 'selected' : '' }}>
+                                        Suspended
+                                    </option>
+                                    <option value="unknown" {{ request('status') == 'unknown' ? 'selected' : '' }}>
+                                        Unknown
+                                    </option>
+                                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>
+                                        Pending
                                     </option>
                                 </select>
                             </div>
@@ -59,8 +65,8 @@
                                         <th scope="col" class="cursor-pointer">No</th>
                                         <th scope="col" class="cursor-pointer">Domain</th>
                                         <th scope="col" class="cursor-pointer text-center">Code</th>
-                                        <th scope="col" class="cursor-pointer">Username</th>
-                                        <th scope="col" class="cursor-pointer text-center">Bandwidth</th>
+                                        <th scope="col" class="cursor-pointer">Owener Email</th>
+                                        <th scope="col" class="cursor-pointer text-center">Username</th>
                                         <th scope="col" class="cursor-pointer text-center">Disk Space</th>
                                         <th scope="col" class="cursor-pointer text-center">Package</th>
                                         <th scope="col" class="cursor-pointer text-center">Expired At</th>
@@ -71,7 +77,7 @@
                                 <tbody>
                                     @if ($domains->isEmpty())
                                         <tr>
-                                            <td colspan="9" class="text-center">
+                                            <td colspan="10" class="text-center">
                                                 <div class="text-muted py-5">
                                                     No domains found. Click Sync Domains to fetch from the server.
                                                 </div>
@@ -100,23 +106,31 @@
                                                 </span>
                                             </td>
                                             <td>
-                                                {{ $item->username ?? '-' }}
+                                                <a href="{{ url('admin/users/' . $item->user_id) }}">
+                                                    <small> {{ $item->user->email ?? '-' }}</small>
+                                                </a>
                                             </td>
-                                            <td class="text-uppercase text-center">{{ $item->package->bandwidth ?? '-' }}
+                                            <td class="text-lowercase text-center">{{ $item->username ?? '-' }}
                                             </td>
                                             <td class="text-center">
                                                 @php
-                                                    $diskSize = $item->package->disk_space
-                                                        ? Number::fileSize($item->package->disk_space * 1024 * 1024)
-                                                        : '-';
-                                                    $colorClass = '';
-                                                    if ($diskSize !== '-') {
-                                                        if (str_contains($diskSize, 'MB')) {
-                                                            $colorClass = 'bg-warning-subtle text-warning';
-                                                        } elseif (str_contains($diskSize, 'GB')) {
-                                                            $colorClass = 'bg-primary-subtle text-primary';
+                                                    if ($item->package) {
+                                                        $diskSize = $item->package->disk_space
+                                                            ? Number::fileSize($item->package->disk_space * 1024 * 1024)
+                                                            : '-';
+                                                        $colorClass = '';
+                                                        if ($diskSize !== '-') {
+                                                            if (str_contains($diskSize, 'MB')) {
+                                                                $colorClass = 'bg-warning-subtle text-warning';
+                                                            } elseif (str_contains($diskSize, 'GB')) {
+                                                                $colorClass = 'bg-primary-subtle text-primary';
+                                                            }
                                                         }
+                                                    } else {
+                                                        $diskSize = '-';
+                                                        $colorClass = 'bg-secondary-subtle text-secondary';
                                                     }
+
                                                 @endphp
                                                 <span
                                                     class="badge {{ $colorClass }} fw-semibold text-uppercase">{{ $diskSize }}</span>
@@ -140,7 +154,7 @@
                                                 @php
                                                     $statusClass = match ($item->status) {
                                                         'active' => 'bg-primary-subtle text-primary',
-                                                        'inactive' => 'bg-danger-subtle text-danger',
+                                                        'unknown' => 'bg-danger-subtle text-danger',
                                                         'suspended' => 'bg-warning-subtle text-warning',
                                                         default => 'bg-secondary-subtle text-secondary',
                                                     };
@@ -149,6 +163,7 @@
                                                     class="badge {{ $statusClass }} fw-semibold text-uppercase">{{ $item->status }}</span>
                                             </td>
                                             <td>
+
                                                 <div class="d-flex gap-2 justify-content-center">
                                                     <div class="dropdown">
                                                         <button class="btn btn-light btn-sm" type="button"
@@ -157,22 +172,50 @@
                                                         </button>
                                                         <ul class="dropdown-menu dropdown-menu-end"
                                                             style="position: absolute; z-index: 9950;">
+                                                            @if ($item->status != 'unknown')
+                                                                <li>
+                                                                    {{-- Detail --}}
+                                                                    <form action="{{ url('admin/domains/' . $item->id) }}"
+                                                                        method="GET" style="display: inline;">
+                                                                        <button type="submit" class="dropdown-item">
+                                                                            <i class="mdi mdi-eye me-2"></i>Detail
+                                                                            {{ $item->username }}
+                                                                        </button>
+                                                                    </form>
+                                                                </li>
+
+                                                                {{-- See User --}}
+                                                                <li>
+                                                                    <a class="dropdown-item"
+                                                                        href="{{ url('admin/users/' . $item->user_id) }}">
+                                                                        <i class="mdi mdi-account me-2"></i>View User
+                                                                    </a>
+                                                                </li>
+
+                                                                {{-- Regenerate Password --}}
+                                                                <li>
+                                                                    <form
+                                                                        action="{{ url('admin/domains/regenerate-password/' . $item->id) }}"
+                                                                        method="POST" style="display: inline;">
+                                                                        @csrf
+                                                                        <button type="submit" class="dropdown-item">
+                                                                            <i class="mdi mdi-refresh me-2"></i>Regenerate
+                                                                            Password
+                                                                        </button>
+                                                                    </form>
+                                                                </li>
+                                                            @endif
+
+                                                            {{-- Sync Domain --}}
                                                             <li>
-                                                                {{-- Detail --}}
-                                                                <form action="{{ url('admin/domains/' . $item->id) }}"
+                                                                <form
+                                                                    action="{{ url('admin/domains/sync/' . $item->id) }}"
                                                                     method="GET" style="display: inline;">
                                                                     <button type="submit" class="dropdown-item">
-                                                                        <i class="mdi mdi-eye me-2"></i>Detail
+                                                                        <i class="mdi mdi-sync me-2"></i>Sync
+                                                                        {{ $item->username }}
                                                                     </button>
                                                                 </form>
-                                                            </li>
-
-                                                            {{-- See User --}}
-                                                            <li>
-                                                                <a class="dropdown-item"
-                                                                    href="{{ url('admin/users/' . $item->user_id) }}">
-                                                                    <i class="mdi mdi-account me-2"></i>View User
-                                                                </a>
                                                             </li>
 
                                                             {{-- Activate and Deactivate --}}
@@ -181,8 +224,7 @@
                                                                     action="{{ url('admin/domains/activate/' . $item->id) }}"
                                                                     method="POST" style="display: inline;">
                                                                     @csrf
-                                                                    <button type="submit"
-                                                                        class="dropdown-item text-success">
+                                                                    <button type="submit" class="dropdown-item">
                                                                         <i class="mdi mdi-play me-2"></i>Activate
                                                                     </button>
                                                                 </form>
@@ -191,8 +233,7 @@
                                                                     action="{{ url('admin/domains/login/' . $item->id) }}"
                                                                     method="POST" name="form">
                                                                     @csrf
-                                                                    <button type="submit"
-                                                                        class="dropdown-item text-primary">
+                                                                    <button type="submit" class="dropdown-item">
                                                                         <i class="mdi mdi-login me-2"></i>Login
                                                                         Dashboard
                                                                     </button>
@@ -207,27 +248,6 @@
                                                                     </button>
                                                                 </form>
                                                             @endif
-                                                            </li>
-
-                                                            {{-- Regenerate Password --}}
-                                                            <li>
-                                                                <form
-                                                                    action="{{ url('admin/domains/regenerate-password/' . $item->id) }}"
-                                                                    method="POST" style="display: inline;">
-                                                                    @csrf
-                                                                    <button type="submit"
-                                                                        class="dropdown-item text-warning">
-                                                                        <i class="mdi mdi-refresh me-2"></i>Regenerate
-                                                                        Password
-                                                                    </button>
-                                                                </form>
-                                                            </li>
-
-                                                            {{-- Delete --}}
-                                                            <li>
-                                                                <a class="dropdown-item text-danger" href="#">
-                                                                    <i class="mdi mdi-delete me-2"></i>Delete
-                                                                </a>
                                                             </li>
                                                         </ul>
                                                     </div>

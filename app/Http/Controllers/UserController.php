@@ -15,13 +15,12 @@ class UserController extends Controller
     // Function to list all user with role 'user'
     public function showUsers(Request $request)
     {
-        $users = User::where('role_id', 2)
-            ->when($request->search, function ($query, $search) {
-                return $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', '%' . $search . '%')
-                        ->orWhere('email', 'like', '%' . $search . '%');
-                });
-            })
+        $users = User::when($request->search, function ($query, $search) {
+            return $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%');
+            });
+        })
             ->withCount('domains')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -43,14 +42,10 @@ class UserController extends Controller
     public function createDomain(Request $request)
     {
         try {
-            $checkDomain = Domain::where('name', ($request->name . "." . config('app.hosting.host', '.batuah.tech')))->first();
-            if ($checkDomain) {
-                return redirect()->back()->withErrors(['name' => 'Domain already exists.'])->withInput()->with('modal-show', true);
-            }
             $request->validate([
                 'user_id' => 'required|exists:users,id',
-                'name' => 'required|string|max:100',
-                'username' => 'required|string|max:50|unique:domain,username',
+                'name' => 'required|string|max:100|alpha_dash|unique:domain,name|lowercase',
+                'username' => 'required|string|max:50|unique:domain,username|lowercase',
                 'package_id' => 'required|exists:package,id',
                 'period' => 'required|integer|in:' . implode(',', $this->getListPeriods()),
             ]);
@@ -71,7 +66,7 @@ class UserController extends Controller
                 'username' => $request->username,
                 'package_id' => $request->package_id,
                 'expires_at' => now()->addDays((int)$request->period),
-                'status' => 'pending', // Pending sebelum domain di create di hosting
+                'status' => 'active',
                 'code' => $code,
             ]);
 
@@ -100,10 +95,7 @@ class UserController extends Controller
             // Check if there's an error in the response
             if (isset($parsedResponse['error']) && $parsedResponse['error'] == '1') {
                 DB::rollBack();
-                return redirect()->back()->withErrors([
-                    'name' => urldecode($parsedResponse['text'] ?? 'Account creation failed'),
-                    'details' => urldecode($parsedResponse['details'] ?? '')
-                ])->withInput()->with('modal-show', true);
+                return redirect()->back()->with('error', $parsedResponse['text'] . ". " . $parsedResponse['details'])->withInput();
             }
 
             // Show success message
@@ -111,7 +103,7 @@ class UserController extends Controller
             return redirect()->back()->with('message', 'Domain created successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->withErrors(['name' => 'Failed to create domain: ' . $e->getMessage()])->withInput()->with('modal-show', true);
+            return redirect()->back()->with(['error' => 'Failed to create domain: ' . $e->getMessage()])->withInput();
         }
     }
 
@@ -181,14 +173,17 @@ class UserController extends Controller
             'phone' => 'required|string|max_digits:20|unique:user_details,phone,' . $user_details_id . '|numeric',
             'address' => 'required|string|max:155',
             'role_id' => 'required|exists:roles,id',
+            'password' => 'nullable|string|min:8',
         ]);
 
         DB::beginTransaction();
         try {
+            // Filled Password
             $user->update([
                 'name' => $request->name,
                 'email' => $request->email,
                 'role_id' => $request->role_id,
+                'password' => $request->filled('password') ? bcrypt($request->password) : $user->password,
             ]);
 
             // Update user details
@@ -306,43 +301,5 @@ class UserController extends Controller
             DB::rollBack();
             return redirect()->back()->withErrors(['error' => 'Failed to deactivate user: ' . $e->getMessage()]);
         }
-    }
-
-
-
-    /*
-        NOTE:
-        Function listUsers() retrieves a list of users from the hosting service.
-    */
-    private function API_listUsers()
-    {
-        $response = Http::withBasicAuth(
-            config('app.hosting.username'),
-            config('app.hosting.password')
-        )->get(config('app.hosting.url') . '/CMD_API_SHOW_USERS');
-        if ($response->successful()) {
-            $users = [];
-            parse_str($response->body(), $users);
-            // Extract usernames from the list array
-            return isset($users['list']) ? $users['list'] : [];
-        }
-        return null;
-    }
-
-    /*
-        NOTE:
-        Function getUserDetail($username) retrieves details of a specific user by username.
-    */
-    private function API_getUserDetail($username)
-    {
-        $response = Http::withBasicAuth(
-            config('app.hosting.username'),
-            config('app.hosting.password')
-        )->get(config('app.hosting.url') . '/CMD_API_SHOW_USER_CONFIG', [
-            'user' => $username
-        ]);
-        return $response->successful() ?
-            tap([], fn(&$userDetail) => parse_str($response->body(), $userDetail)) :
-            null;
     }
 }

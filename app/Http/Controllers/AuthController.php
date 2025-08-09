@@ -65,7 +65,7 @@ class AuthController extends Controller
                 'password' => bcrypt($request->password),
                 'role_id' => 2, // 2 Is the role ID for 'user' --- IGNORE
             ]);
-            
+
             UserDetails::create([
                 'user_id' => $user->id,
                 'phone' => $request->phone,
@@ -117,14 +117,17 @@ class AuthController extends Controller
         if (!$user || !hash_equals((string) $request->hash, sha1($user->getEmailForVerification()))) {
             return redirect('/login')->with('error', 'Invalid verification link.');
         }
-
         if ($user->hasVerifiedEmail()) {
-            return redirect('/login')->with('message', 'Email already verified.');
+            if (Auth::check()) {
+                return redirect(Auth::user()->role->name . '/dashboard');
+            }
+            return redirect('/login')->with('success', 'Email already verified.');
         }
-
         $user->markEmailAsVerified();
-
-        return redirect('/login')->with('success', 'Email verified successfully. You can now log in.');
+        if (Auth::check()) {
+            return redirect(Auth::user()->role->name . '/dashboard');
+        }
+        return redirect('/login')->with('success', 'Email verified successfully.');
     }
 
     public function logout(): \Illuminate\Http\RedirectResponse
