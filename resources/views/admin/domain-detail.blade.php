@@ -48,11 +48,20 @@
                                                     <i class="mdi mdi-login me-1"></i>Login Dashboard
                                                 </button>
                                             </form>
-                                            <form action="{{ url('admin/users/' . $domain->id . '/deactivate') }}"
-                                                method="POST" style="display: inline;">
+                                            <form action="{{ url('admin/domains/suspend/' . $domain->id) }}" method="POST"
+                                                style="display: inline;">
                                                 @csrf
-                                                <button type="submit" class="btn btn-outline-danger btn-sm">
-                                                    <i class="mdi mdi-pause me-1"></i>Deactivate
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    <i class="mdi mdi-close me-1"></i>
+                                                    Suspend
+                                                </button>
+                                            </form>
+                                        @elseif($domain->status === 'suspended')
+                                            <form action="{{ url('admin/domains/activate/' . $domain->id) }}" method="POST"
+                                                style="display: inline;">
+                                                @csrf
+                                                <button type="submit" class="btn btn-success btn-sm">
+                                                    <i class="mdi mdi-play me-1"></i>Activate
                                                 </button>
                                             </form>
                                         @endif
@@ -90,7 +99,11 @@
                                                     </tr>
                                                     <tr>
                                                         <td class="fw-medium">Domain</td>
-                                                        <td>: {{ $domain->name }}</td>
+                                                        <td>:
+                                                            <a href="http://{{ $domain->name }}" target="_blank">{{ $domain->name }}
+                                                                <i class="mdi mdi-open-in-new"></i>
+                                                            </a>
+                                                        </td>
                                                     </tr>
                                                     <tr>
                                                         <td class="fw-medium">Username</td>
@@ -108,9 +121,9 @@
                                                     </tr>
                                                     <tr>
                                                         <td class="fw-medium">Status</td>
-                                                        <td>:
+                                                        <td class="text-uppercase">:
                                                             <span
-                                                                class="badge bg-{{ $domain->status == 'active' ? 'success' : 'danger' }}">
+                                                                class="badge bg-{{ $domain->status == 'active' ? 'primary-subtle text-primary' : 'warning-subtle text-warning' }}">
                                                                 {{ ucfirst($domain->status) }}
                                                             </span>
                                                         </td>

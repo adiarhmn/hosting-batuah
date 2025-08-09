@@ -54,10 +54,12 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'access:admin', 'ver
             Route::get('/{id}', 'domainDetail');
             Route::post('/login/{id}', 'loginDomain');
             Route::post('/activate/{id}', 'activateDomain');
+            Route::post('/suspend/{id}', 'suspendDomain');
             Route::post('/deactivate/{id}', 'deactivateDomain');
             Route::post('/regenerate-password/{id}', 'regeneratePassword');
         });
 });
+
 
 
 /*
